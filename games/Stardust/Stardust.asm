@@ -17,7 +17,9 @@
 ;               19.12.2000 - intro - blitter waits added
 ;                          - boot - cacr+vbr access removed
 ;                          - skip intro option added (custom1)
-;                          - quit routine removed - useless
+;               09.01.2001 - my bug in loader removed (intro sound works now)
+;                          - outro quit routine removed - useless
+;			   - game - 4x blitter waits added
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -32,14 +34,14 @@
 base
 		SLAVE_HEADER		;ws_Security + ws_ID
 		dc.w	10		;ws_Version
-		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap|WHDLF_NoKbd	;ws_flags
+		dc.w	WHDLF_NoError|WHDLF_EmulTrap|WHDLF_NoKbd
 		dc.l	$100000		;ws_BaseMemSize
 		dc.l	0		;ws_ExecInstall
 		dc.w	Start-base	;ws_GameLoader
 		dc.w	0		;ws_CurrentDir
 		dc.w	0		;ws_DontCache
 _keydebug	dc.b	0		;ws_keydebug = none
-_keyexit	dc.b	$5d		;ws_keyexit
+_keyexit	dc.b	$59		;ws_keyexit
 _expmem		dc.l	0		;ws_ExpMem
 		dc.w	_name-base	;ws_name
 		dc.w	_copy-base	;ws_copy
@@ -48,44 +50,46 @@ _expmem		dc.l	0		;ws_ExpMem
 _name		dc.b	"Stardust",0
 _copy		dc.b	"1993 Bloodhouse",0
 _info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal",10
-		dc.b	"V1.3 (19-Dec-2000)",0
+		dc.b	"V1.3 (09-Jan-2001)",0
 
 Start		lea	_resload,a1
 		move.l	a0,(a1)
 		move.l	a0,a2
-                lea     (_tags,pc),a0
-                jsr     (resload_Control,a2)
+		lea     (_tags,pc),a0
+		jsr     (resload_Control,a2)
 
 		lea	$7000,a0
-		move.l	a0,a5
+		move.l	a0,-(sp)
 		moveq	#0,d0
 		move.l	#$1600,d1
 		moveq	#1,d2
 		jsr	resload_DiskLoad(a2)
+		move.l	(sp)+,a0
 
-		lea	intro,a0
-		tst.l	(a0)
+		lea	intro,a6
+		tst.l	(a6)
 		beq	PatchBoot
-		move.b	#$60,$18e(a5)		;skip intro
-PatchBoot	move.w	#$4eb9,$22a(a5)
+		move.b	#$60,$18e(a0)		;skip intro
+
+PatchBoot	move.w	#$4eb9,$22a(a0)
 		pea	PatchIntro
-		move.l	(sp)+,$22c(a5)
+		move.l	(sp)+,$22c(a0)
 
-		move.w	#$4ef9,$29C(a5)
+		move.w	#$4ef9,$29C(a0)
 		pea	PatchGame
-		move.l	(sp)+,$29E(a5)
+		move.l	(sp)+,$29E(a0)
 
-		move.w	#$4ef9,$686(a5)
+		move.w	#$4ef9,$686(a0)
 		pea	Load
-		move.l	(sp)+,$688(a5)
+		move.l	(sp)+,$688(a0)
 
-		move.w	#$602c,$158(a5)		;disk access
-		move.w	#$600c,$d2(a5)		;vbr+cacr operation
+		move.w	#$602c,$158(a0)		;disk access
+		move.w	#$600c,$d2(a0)		;vbr+cacr operation
 
 		moveq	#0,d1			; attn flag
-		move.l	a5,d6			; loader address
-		move.l	#$80000-$400,d7		; ext mem
-		jmp	$C4(A5)
+		move.l	a0,d6			; loader address
+		move.l	#$7fc00,d7		; ext mem
+		jmp	$C4(a0)
 
 PatchGame	move.l	$782E4,a5
 		move.w	#$F080,$4404(a5)	;remove access faults
@@ -273,6 +277,18 @@ PatchGame	move.l	$782E4,a5
 		move.w	d0,$e8ca0
 		pea	PatchSM
 		move.l	(sp)+,$e8ca2
+
+		move.l	d0,$90bec
+		move.l	d0,$88264
+		pea	BlitFix3
+		move.l	(sp),$90bf0
+		move.l	(sp)+,$88268
+
+		move.l	d0,$83ccc
+		move.l	d0,$842cc
+		pea	BlitFix4
+		move.l	(sp),$83cd0
+		move.l	(sp)+,$842d0
 
 		move.w	#$4ef9,$12e(a5)
 		pea	PatchOutro
@@ -743,8 +759,10 @@ Load		movem.l	d0/d2-a6,-(sp)
 		sub.l	#$230,d0
 		move.l	2(a1),d1
 		and.l	#$FFFFF,d1
+		move.l	d1,-(sp)
 		move.l	_resload,a2
 		jsr	resload_DiskLoad(a2)
+		move.l	(sp)+,d1
 		movem.l	(sp)+,d0/d2-a6
 		rts
 
@@ -807,6 +825,15 @@ BlitFix		bsr	BlitWait
 BlitFix2	move.w	#$202c,$dff058
 BlitWait	btst	#6,$dff002
 		bne	BlitWait
+		rts
+
+BlitFix3	bsr	BlitWait
+		move.l	#$ffff0000,$44(a6)
+		rts
+
+BlitFix4	bsr	BlitWait
+		move.w	d1,$42(a6)
+		ori.w	#$fca,d1
 		rts
 
 _resload	dc.l	0
