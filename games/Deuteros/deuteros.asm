@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.5 1998/10/08 00:44:52 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.6 1998/10/15 23:42:19 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -11,6 +11,8 @@
 ;		30.09.98 first patch for random routine changed
 ;		08.10.98 patch for "reaching stars" sequence added (Björn Hagström)
 ;			 new patch routine
+;		16.12.98 on second version also bad version requester appears
+;			 cache disabled by default
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -25,7 +27,7 @@
 	INCLUDE	lvo/exec.i
 
 	IFD	BARFLY
-	OUTPUT	"wart:d-l/deuteros/deuteros.slave"
+	OUTPUT	"wart:d-f/deuteros/Deuteros.Slave"
 	BOPT	O+ OG+				;enable optimizing
 	BOPT	ODd- ODe-			;disable mul optimizing
 	BOPT	w4-				;disable 64k warnings
@@ -54,7 +56,7 @@ _keyexit	dc.b	$59			;ws_keyexit = F10
 ;============================================================================
 
 	IFD	BARFLY
-		dc.b	"$VER: Deuteros.Slave by Wepl "
+		dc.b	"$VER: Deuteros.Slave 1.7 by Wepl "
 	DOSCMD	"WDate >T:date"
 	INCBIN	"T:date"
 		dc.b	0
@@ -68,9 +70,9 @@ _Start	;	A0 = resident loader
 		move.l	a0,(RESLOAD)			;save for later using
 
 	;enable cache
-		move.l	#CACRF_EnableI,d0		;enable instruction cache
-		move.l	d0,d1    			;mask
-		jsr	(resload_SetCACR,a0)
+	;	move.l	#CACRF_EnableI,d0		;enable instruction cache
+	;	move.l	d0,d1    			;mask
+	;	jsr	(resload_SetCACR,a0)
 
 	;init vars
 		move.l	#0,ACTDISK
@@ -99,7 +101,6 @@ _Start	;	A0 = resident loader
 		move.l	a2,a0			;the resload base
 		lea	(_base,pc),a1		;the slave structure
 		jsr	$400
-
 	;start the program
 		move	#0,sr			;if the program uses the os it
 						;should executed in user mode
@@ -115,29 +116,26 @@ _Start	;	A0 = resident loader
 		move.l	a4,a0
 		jsr	(resload_CRC16,a3)
 		cmp.w	#$d84b,d0
-		beq	.v1
-		cmp.w	#$8ab8,d0
-		beq	.v2
-		bra	_badver
+	bne	_badver
+	;	beq	.v1
+	;	cmp.w	#$8ab8,d0
+	;	beq	.v2
+	;	bra	_badver
 
 .v1	;some fixes
 		ret	$9ae(a4)		;rn-copylock
 	;delay
 		patch	$12b1a,.delay
+	IFEQ 1
 		bra	.vall
 
-.v2
-	IFEQ 0
-		lea	$12800,a0
+.v2		lea	$12800,a0
 		lea	$12500,a1
 		move.l	a1,a4
 		move.l	#$2c00,d0
 .v2_1		move.l	(a0)+,(a1)+
 		subq.l	#4,d0
 		bne	.v2_1
-	illegal
-	ELSE
-		bra	_badver
 	ENDC
 .vall
 	;variables
