@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.7 1998/12/16 19:07:14 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.8 1999/07/07 20:15:55 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -14,6 +14,7 @@
 ;		16.12.98 on second version also bad version requester appears
 ;			 cache disabled by default
 ;		07.07.99 reworked for whdload v10
+;		03.08.01 adapted for kickemu
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -24,14 +25,13 @@
 	INCDIR	Includes:
 	INCLUDE	whdload.i
 	INCLUDE	whdmacros.i
-	INCLUDE	exec/io.i
-	INCLUDE	devices/trackdisk.i
-	INCLUDE	lvo/exec.i
 
 	IFD	BARFLY
-	OUTPUT	"wart:d-e/deuteros/Deuteros.Slave"
-	BOPT	O+ OG+				;enable optimizing
-	BOPT	ODd- ODe-			;disable mul optimizing
+	OUTPUT	"wart:d/deuteros/Deuteros.Slave"
+	BOPT	O+				;enable optimizing
+	BOPT	OG+				;enable optimizing
+	BOPT	ODd-				;disable mul optimizing
+	BOPT	ODe-				;disable mul optimizing
 	BOPT	w4-				;disable 64k warnings
 	SUPER
 	ENDC
@@ -39,22 +39,62 @@
 	STRUCTURE	globals,$100
 		LONG	ACTDISK
 		LONG	DOIO_OS
-		LONG	RESLOAD
 		LONG	SIZE3
 
 ;============================================================================
 
+; number of floppy drives:
+;	sets the number of floppy drives, valid values are 0-4.
+;	0 means that the number is specified via option Custom1/N
+NUMDRIVES=1
+
+; protection state for floppy disks:
+;	0 means 'write protected', 1 means 'read/write'
+;	bit 0 means drive DF0:, bit 3 means drive DF3:
+WPDRIVES=%1111
+
+; disable fpu support:
+;	results in a different task switching routine, if fpu is enabled also
+;	the fpu status will be saved and restored.
+;	for better compatibility and performance the fpu should be disabled
+NOFPU
+
+; enable debug support for hrtmon:
+;	hrtmon reads to much from the stackframe if entered, if the ssp is at
+;	the end hrtmon will create a access fault.
+;	for better compatibility this option should be disabled
+;HRTMON
+
+; calculate minimal amount of free memory
+;	if the symbol MEMFREE is defined after each call to exec.AllocMem the
+;	size of the largest free memory chunk will be calculated and saved at
+;	the specified address if lower than the previous saved value (chipmem
+;	at MEMFREE, fastmem at MEMFREE+4)
+;MEMFREE=$100
+
+; amount of memory available for the system
+CHIPMEMSIZE	= $100000
+FASTMEMSIZE	= 0
+
+;============================================================================
+
+KICKSIZE	= $40000			;34.005
+BASEMEM		= CHIPMEMSIZE
+EXPMEM		= KICKSIZE+FASTMEMSIZE
+
+;============================================================================
+
 _base		SLAVE_HEADER			;ws_Security + ws_ID
-		dc.w	10			;ws_Version
+		dc.w	14			;ws_Version
 		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap	;ws_flags
-		dc.l	$100000			;ws_BaseMemSize
+		dc.l	BASEMEM			;ws_BaseMemSize
 		dc.l	0			;ws_ExecInstall
 		dc.w	_Start-_base		;ws_GameLoader
 		dc.w	0			;ws_CurrentDir
 		dc.w	0			;ws_DontCache
 _keydebug	dc.b	0			;ws_keydebug = F9
 _keyexit	dc.b	$59			;ws_keyexit = F10
-_expmem		dc.l	0			;ws_ExpMem
+_expmem		dc.l	EXPMEM			;ws_ExpMem
 		dc.w	_name-_base		;ws_name
 		dc.w	_copy-_base		;ws_copy
 		dc.w	_info-_base		;ws_info
@@ -66,11 +106,10 @@ _expmem		dc.l	0			;ws_ExpMem
 .passchk
 	ENDC
 
-_data		dc.b	"data",0
 _name		dc.b	"Deuteros",0
 _copy		dc.b	"1991 Ian Bird",0
 _info		dc.b	"installed & fixed by Wepl",10
-		dc.b	"Version 1.8 "
+		dc.b	"Version 1.9 "
 		INCBIN	"T:date"
 		dc.b	0
 	EVEN
@@ -79,87 +118,46 @@ _info		dc.b	"installed & fixed by Wepl",10
 _Start	;	A0 = resident loader
 ;============================================================================
 
-		move.l	a0,(RESLOAD)			;save for later using
+	;initialize kickstart and environment
+		bra	_boot
 
-	;enable cache
-	;	move.l	#CACRF_EnableI,d0		;enable instruction cache
-	;	move.l	d0,d1    			;mask
-	;	jsr	(resload_SetCACR,a0)
+_bootearly
 
 	;init vars
-		move.l	#0,ACTDISK
+		move.l	#1,ACTDISK
 
 	;get savedisksize
-		lea	(_disk3),a0
-		move.l	(RESLOAD),a1
+		lea	(_savename),a0
+		move.l	(_resload),a1
 		jsr	(resload_GetFileSize,a1)
 		move.l	d0,(SIZE3)
 		
-	;clear mem for title picture
-		lea	$8ab00,a0
-		lea	$92800,a1
-.cl		clr.l	(a0)+
-		cmp.l	a0,a1
-		bne	.cl
-
-	;load the osemu module
-		lea	(_osemu,pc),a0		;filename of the osemu module
-		lea	$400,a1			;the address on which you have
-						;assembled the osemu module
-		move.l	(RESLOAD),a2		;the resload base
-		jsr	(resload_LoadFileDecrunch,a2)	;this allows to
-						;compress the osemu
-	;init the osemu module
-		move.l	a2,a0			;the resload base
-		lea	(_base,pc),a1		;the slave structure
-		jsr	$400
-	;start the program
-		move	#0,sr			;if the program uses the os it
-						;should executed in user mode
 	;bootblock stuff
 		move.l	#$2c00,d0		;offset
 		move.l	#$2c00,d1		;size
 		moveq	#1,d2			;disk
 		lea	$12800,a0		;destination
 		move.l	a0,a4
-		move.l	(RESLOAD),a3
+		move.l	(_resload),a3
 		jsr	(resload_DiskLoad,a3)
 		move.l	#$2c00,d0
 		move.l	a4,a0
 		jsr	(resload_CRC16,a3)
 		cmp.w	#$d84b,d0
-	bne	_badver
-	;	beq	.v1
-	;	cmp.w	#$8ab8,d0
-	;	beq	.v2
-	;	bra	_badver
+		beq	.v1
+		pea	TDREASON_WRONGVER
+		jmp	(resload_Abort,a3)
 
 .v1	;some fixes
 		ret	$9ae(a4)		;rn-copylock
 	;delay
 		patch	$12b1a,.delay
-	IFEQ 1
-		bra	.vall
 
-.v2		lea	$12800,a0
-		lea	$12500,a1
-		move.l	a1,a4
-		move.l	#$2c00,d0
-.v2_1		move.l	(a0)+,(a1)+
-		subq.l	#4,d0
-		bne	.v2_1
-	ENDC
-.vall
 	;variables
 		clr.l	$12fdc
 		clr.l	$12ff4
-	;	move.l	$300,$12ff8		;ioreq
+		move.l	#0,$12ff8		;ioreq
 		clr.l	$12ffc
-	;reset colors
-		lea	(_custom+color),a0
-		moveq	#32/2-1,d0
-.cl2		clr.l	(a0)+
-		dbf	d0,.cl2
 	;hook for doio
 		move.l	(4),a0
 		move.l	(_LVODoIO+2,a0),(DOIO_OS)
@@ -181,11 +179,16 @@ _Start	;	A0 = resident loader
 
 ;--------------------------------
 
-_doio		move.l	ACTDISK,(IO_UNIT,a1)
-		cmp.l	#$2063e,a1		;savedisk ?
+_doio		movem.l	d0-d1/a0-a1,-(a7)
+		moveq	#0,d0			;unit
+		move.l	(ACTDISK),d1		;image
+		bsr	_trd_changedisk
+		movem.l	(a7)+,_MOVEMREGS
+
+		cmp.l	#3,(ACTDISK)
 		bne	.go
+
 	;savedisk
-		move.l	#2,(IO_UNIT,a1)		;saving to disk #3
 		cmp.w	#ETD_WRITE,(IO_COMMAND,a1)
 		beq	.go
 		cmp.w	#ETD_READ,(IO_COMMAND,a1)
@@ -195,7 +198,7 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 		add.l	(IO_LENGTH,a1),d0
 		cmp.l	(SIZE3),d0
 		bhi	.clr
-	;enter osemu function
+	;enter os function
 .go		move.l	(DOIO_OS),a0
 		jsr	(a0)
 	;check command
@@ -220,7 +223,6 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 .next		movem.l	(a0)+,d0-d4
 		tst.l	d0
 		beq	.end
-		subq.l	#1,d0
 		cmp.l	(ACTDISK),d0
 		bne	.next
 		cmp.l	(IO_LENGTH,a1),d1
@@ -257,7 +259,8 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 	;main exe
 .main		patch	$38818,_disk2		;insert data disk
 		move.l	#$20000,$3f766		;bad random generator reading from $ff0000
-		skip	$130-$116,$38116	;check for savedisk
+	;	skip	$130-$116,$38116	;check for savedisk
+		patchs	$38116,_disk3
 		ret	$3867c			;format savedisk
 		move.w	#$4e71,$3fc0e		;sound play fix
 		rts
@@ -271,7 +274,7 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 		rts
 .af1		clr.w	$2174c			;access fault (extro)
 		clr.w	$21750			;access fault (extro)
-		clr.l	ACTDISK
+		move.l	#1,ACTDISK
 		move.l	$2174c,a0		;original
 		rts
 
@@ -285,22 +288,20 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 
 ;--------------------------------
 
-_disk2		move.l	#1,ACTDISK
+_disk2		move.l	#2,ACTDISK
+		rts
+_disk3		move.l	#3,ACTDISK
+		add.l	#$130-$116-6,(a7)
 		rts
 
 ;--------------------------------
 
-_badver		pea	TDREASON_WRONGVER.w
-		bra	_end
-_end		move.l	(RESLOAD),-(a7)
-		add.l	#resload_Abort,(a7)
-		rts
+_savename	dc.b	"Disk.3",0
+	EVEN
 
-;--------------------------------
+;============================================================================
 
-_version	dc.w	1
-_disk3		dc.b	"Disk.3",0
-_osemu		dc.b	"OSEmu.400",0
+	INCLUDE	Sources:whdload/kick13.s
 
 ;============================================================================
 
