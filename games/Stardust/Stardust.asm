@@ -1,8 +1,18 @@
 ;*---------------------------------------------------------------------------
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Blood House
-;  :Author.	Mr.Larmer of Wanted Team
-;  :History.	27.03.2000
+;  :Author.	Mr.Larmer of Wanted Team, Bored Seal
+;  :History.	27.03.2000 - first release (Mr Larmer)
+; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
+;                          - highscore is saved to file now
+;               02.12.2000 - disk access removed
+;                          - password feature
+;               10.12.2000 - tunnel 1 faults removed
+;                          - tunnel 2 faults removed
+;                          - tunnel 3 faults removed
+;               11.12.2000 - tunnel 4 faults removed
+;                          - special missions fixed
+;               13.12.2000 - access fault in outro fixed
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -10,16 +20,9 @@
 ;  :To Do.
 ;---------------------------------------------------------------------------*
 
-	INCDIR	Include:
-	INCLUDE	whdload.i
-	INCLUDE	whdmacros.i
-
-	OUTPUT	dh2:Stardust/Stardust.slave
-	OPT	O+ OG+			;enable optimizing
-
-Trainer		=	0	; 1 - on ; 0 -off
-
-;======================================================================
+		INCDIR	Include:
+		INCLUDE	whdload.i
+		INCLUDE	whdmacros.i
 
 base
 		SLAVE_HEADER		;ws_Security + ws_ID
@@ -31,164 +34,691 @@ base
 		dc.w	0		;ws_CurrentDir
 		dc.w	0		;ws_DontCache
 _keydebug	dc.b	0		;ws_keydebug = none
-_keyexit	dc.b	$59		;ws_keyexit = F10
+_keyexit	dc.b	$5d		;ws_keyexit
 _expmem		dc.l	0		;ws_ExpMem
 		dc.w	_name-base	;ws_name
 		dc.w	_copy-base	;ws_copy
 		dc.w	_info-base	;ws_info
 
-_name	dc.b	'Stardust',0
-_copy	dc.b	'1993 Bloodhouse',0
-_info	dc.b	'Installed and fixed by Mr.Larmer',10
-	dc.b	'Version 1.1 (27.03.2000)',-1
-	dc.b	'Greetings to Chris Vella',0
-	CNOP 0,2
+_name		dc.b	"Stardust",0
+_copy		dc.b	"1993 Bloodhouse",0
+_info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal",10
+		dc.b	"V1.2 (29-Nov-2000)",0
 
-;======================================================================
-Start	;	A0 = resident loader
-;======================================================================
+Start		lea	_resload,a1
+		move.l	a0,(a1)
+		move.l	a0,a2
 
-		lea	_resload(pc),a1
-		move.l	a0,(a1)			;save for later use
+		lea	$7000,a0
+		move.l	a0,a5
+		moveq	#0,d0
+		move.l	#$1600,d1
+		moveq	#1,d2
+		jsr	resload_DiskLoad(a2)
 
-		lea	Tags(pc),a0
-		move.l	_resload(pc),a2
-		jsr	resload_Control(a2)
+		move.w	#$4EF9,$29C(a5)
+		pea	Patch
+		move.l	(sp)+,$29E(a5)
 
-		lea	$7000.w,A0
-		moveq	#0,D0
-		move.l	#$1600,D1
-		moveq	#1,D2
-		bsr.w	_LoadDisk
+		move.w	#$4EF9,$686(a5)
+		pea	Load
+		move.l	(sp)+,$688(a5)
 
-		move.w	#$4EF9,$29C(a0)
-		pea	Patch(pc)
-		move.l	(a7)+,$29E(a0)
-
-		move.w	#$4EF9,$686(a0)
-		pea	Load(pc)
-		move.l	(a7)+,$688(a0)
+		move.w	#$602c,$158(a5)		;disk access
 
 		moveq	#0,d1			; attn flag
-		move.l	a0,d6			; loader address
+		move.l	a5,d6			; loader address
 		move.l	#$80000-$400,d7		; ext mem
+		jmp	$C4(A5)
 
-		jmp	$C4(A0)
+Patch		move.l	$782E4,a5
+		move.w	#$F080,$4404(a5)	;remove access faults
+		move.w	#$F084,$1778(a5)
+		move.w	#$F084,$2e74(a5)
 
-Tags
-		dc.l	WHDLTAG_Private3
-_keyenabled
-		dc.l	0
-		dc.l	0
+		move.w	#$f088,d0
+		move.w	d0,$e816c
+		move.w	d0,$e824a
+		move.w	d0,$e82d2
+		move.w	d0,$e835a
+		move.w	d0,$e8446
+		move.w	d0,$e8522
+		move.w	d0,$e85aa
+		move.w	d0,$e8632
+		move.w	d0,$e86b4
+		move.w	d0,$e86ea
+		move.w	d0,$e87c6
+		move.w	d0,$e88ba
+		move.w	d0,$e893c
+		move.w	d0,$e8972
+		move.w	d0,$e8a4e
+		move.w	d0,$e8b42
+		move.w	d0,$e8bc4
+		move.w	d0,$e8c1e
+		move.w	d0,$e8cc0
+		move.w	d0,$e8d08
+		move.w	d0,$e8d9a
+		move.w	d0,$e8dc6
 
-;--------------------------------
+		move.w	#$96,$19a0(a5)
 
-Patch
-		move.l	$782E4,a5
+		move.w	#$f09a,d0
+		move.w	d0,$1224(a5)
+		move.w	d0,$11b0(a5)
+		move.w	d0,$11e8(a5)
 
-	ifne	0
-; many access fault to remove :(
-		move.l	#$DFF080,$3E(a5)
-		move.l	#$DFF080,$88(a5)
-		move.l	#$DFF080,$E8CAC
-		move.l	#$DFF080,$EC984
-		move.l	#$DFF080,$EC99A
-		add.w	#$1200,$16A(a5)		; access fault fixed
-		add.w	#$1200,$170(a5)
-		add.w	#$1C00,$EB5A8
-		add.w	#$1C00,$EB5AE
-		add.w	#$1C00,$EB5EA
-		add.w	#$1C00,$EB5F0
-		add.w	#$1C00,$EB5F4
-		add.w	#$1C00,$EB5F8
-		add.w	#$1C00,$EB5FC
-		add.w	#$1C00,$EB602
-	endc
 		move.w	#$4EB9,$340(a5)
-		pea	Decrunch(pc)
-		move.l	(a7)+,$342(a5)
+		pea	Decrunch
+		move.l	(sp)+,$342(a5)
 
-		move.w	#$4EF9,$57C(a5)
-		pea	Load(pc)
-		move.l	(a7)+,$57E(a5)
+		move.w	#$4ef9,d0
+		move.w	d0,$57C(a5)
+		pea	Load
+		move.l	(sp)+,$57E(a5)
 
-		move.w	#$4E75,$4016(a5)	; skip check some cardridges?
+		move.w	d0,$ED41A
+		pea	LoadSaveHighs
+		move.l	(sp)+,$ED41C
 
-		move.w	#$4EF9,$ED41A
-		pea	LoadSaveHighs(pc)
-		move.l	(a7)+,$ED41C
+		move.w	d0,$6668(a5)
+		move.w	d0,$ec7d0
+		pea	GetAdr
+		move.l	(sp),$ec7d2
+		move.l	(sp)+,$666a(a5)
 
+		move.w	#$4E75,$4016(a5)	;no cartridge check
+
+		move.l	a5,a0			;80000
+		lea	$f0000,a2
+		move.w	#$4a2e,d1
+		move.w	#$be02,d2
+		moveq	#2,d3
+		bsr	Replace
+
+		moveq	#$e,d1
+		bsr	Replace
+		move.w	d3,$6522(a5)
+
+		move.w	#$ac40,d1
+		moveq	#$40,d3
+		bsr	Repl2cod
+
+		move.w	#$be42,d1
+		moveq	#$42,d3
+		bsr	Repl2cod
+
+		move.w	#$e648,d1
+		moveq	#$48,d3
+		bsr	Repl2cod
+
+		move.w	#$d44c,d1
+		moveq	#$4c,d3
+		bsr	Repl2cod
+
+		move.w	#$c250,d1
+		moveq	#$50,d3
+		bsr	Repl2cod
+
+		move.w	#$f854,d1
+		moveq	#$54,d3
+		bsr	Repl2cod
+		move.w	d3,$60ae(a5)
+		move.w	d3,$68b4(a5)
+		move.w	d3,$7b48(a5)
+
+		move.w	#$f458,d1
+		moveq	#$58,d3
+		bsr	Repl2cod
+		move.w	d3,$60b4(a5)
+		move.w	d3,$68b8(a5)
+		move.w	d3,$87b4c
+
+		move.w	#$ae60,d1
+		moveq	#$60,d3
+		bsr	Repl2cod
+
+		move.w	#$bc62,d1
+		moveq	#$62,d3
+		bsr	Repl2cod
+
+		move.w	#$9a64,d1
+		moveq	#$64,d3
+		bsr	Repl2cod
+
+		move.w	#$b266,d1
+		moveq	#$66,d3
+		bsr	Repl2cod
+		move.w	d3,$87b44
+		move.w	d3,$60a8(a5)
+		move.w	d3,$68b0(a5)
+
+		move.w	#$f458,d1
+		move.w	#$9a64,d2
+		move.w	#$ae60,d3
+		move.w	#$bc62,d4
+		move.w	#$b266,d5
+		move.w	#$ac40,d6
+		move.w	#$be42,d7
+		bsr	Replace2
+
+		move.w	#$2d7c,d1
+		move.w	#$ea44,d2
+		moveq	#$44,d3
+		bsr	Replace3
+
+		move.w	#$c250,d2
+		moveq	#$50,d3
+		bsr	Replace3
+
+		move.w	#$f854,d2
+		moveq	#$54,d3
+		bsr	Replace3
+
+		move.w	#$2d79,d1
+		move.w	#$e648,d2
+		moveq	#$48,d3
+		bsr	Replace3
+
+		move.w	#$f854,d2
+		moveq	#$54,d3
+		bsr	Replace3
+		move.w	d3,$e908a
+
+		move.w	#$750,d1
+		move.w	#$00df,d2
+		move.w	#$f080,d3
+		bsr	Replace4
+
+		move.w	#$88c,d1
+		move.w	#$00df,d2
+		move.w	#$f080,d3
+		bsr	Replace4
+
+		move.w	#$6006,$8ac2c		;disk access
+		bsr	LoadPass
+
+		move.l	#$4e714eb9,d0
+		move.l	d0,$e8224
+		pea	PatchTun1
+		move.l	(sp)+,$e8228
+
+		move.l	d0,$e84fc
+		pea	PatchTun2
+		move.l	(sp)+,$e8500
+
+		move.l	d0,$e87a0
+		pea	PatchTun3
+		move.l	(sp)+,$e87a4
+
+		move.l	d0,$e8a28
+		pea	PatchTun4
+		move.l	(sp)+,$e8a2c
+
+		move.w	d0,$e8ca0
+		pea	PatchSM
+		move.l	(sp)+,$e8ca2
+
+		move.w	#$4ef9,$12e(a5)
+		pea	PatchOutro
+		move.l	(sp)+,$130(a5)
+
+;		move.w	#$4ef9,$9e(a5)		;enable outro
+;		move.l	#$8011a,$a0(a5)
 		jmp	(a5)
 
-;--------------------------------
+PatchSM		movem.l	a0-a4/d0-d5,-(sp)
+		move.w	#$96,$8f4
+		move.w	#$f050,$30b0
+		move.w	#$f058,$30b6
 
-Decrunch
-		move.l	a2,-(a7)
+		move.w	#$40,$3094
+		move.w	#$42,$309a
+		move.w	#$64,$30a0
+		move.w	#$66,$30a6
+		move.w	#$54,$30e2
 
-		lea	Size(pc),a2
+		lea	$178e,a1			;access fault fixes
+		lea	$5000,a2
+		moveq	#$e,d1
+		move.w	#$802,d2
+		moveq	#2,d3
+		bsr	Replace
+
+		move.w	#$2d7c,d1
+		move.w	#$e44,d2
+		moveq	#$44,d3
+		bsr	Replace3
+
+		movem.l	(sp)+,a0-a4/d0-d5
+		move.w	$e8bf2,d3
+		jmp	(a5)
+
+PatchOutro	move.w	#2,$1358		;fix access fault
+		jmp	$7d4
+
+PatchTun4	movem.l	a0-a4/d0-d5,-(sp)
+		move.w	#$6006,$1dde
+		lea	$db0,a1			;access fault fixes
+		lea	$6460,a2
+
+		move.w	#$4a6d,d1
+		move.w	#$602,d2
+		moveq	#2,d3
+		bsr	Replace
+		moveq	#$e,d1
+		bsr	Replace
+		move.w	d3,$3de8
+		move.w	d3,$45da
+
+		move.w	#$440,d1
+		moveq	#$40,d3
+		bsr	Repl2cod
+
+		move.w	#$642,d1
+		moveq	#$42,d3
+		bsr	Repl2cod
+
+		move.w	#$848,d1
+		moveq	#$48,d3
+		bsr	Repl2cod
+
+		move.w	#$84c,d1
+		moveq	#$4c,d3
+		bsr	Repl2cod
+
+		move.w	#$650,d1
+		moveq	#$50,d3
+		bsr	Repl2cod
+
+		move.w	#$a54,d1
+		moveq	#$54,d3
+		bsr	Repl2cod
+		move.w	d3,$63e4
+
+		move.w	#$e58,d1
+		moveq	#$58,d3
+		bsr	Repl2cod
+
+		move.w	#$c60,d1
+		moveq	#$60,d3
+		bsr	Repl2cod
+
+		move.w	#$e66,d1
+		moveq	#$66,d3
+		bsr	Repl2cod
+
+		move.w	#$e58,d1
+		move.w	#$a64,d2
+		move.w	#$c60,d3
+		move.w	#$c62,d4
+		move.w	#$e66,d5
+		move.w	#$642,d6
+		move.w	#$440,d7
+		bsr	Replace2
+
+		move.w	#$2b7c,d1
+		move.w	#$444,d2
+		moveq	#$44,d3
+		bsr	Replace3
+		move.w	d3,$5e36
+		move.w	d3,$63de
+		bra	RunIt
+
+PatchTun3	movem.l	a0-a4/d0-d5,-(sp)
+		move.w	#$6006,$181a
+		lea	$d40,a1			;access fault fixes
+		lea	$6470,a2
+		move.w	#$4a6d,d1
+		move.w	#$202,d2
+		moveq	#2,d3
+		bsr	Replace
+		moveq	#$e,d1
+		bsr	Replace
+		move.w	d3,$3d48
+		move.w	d3,$460c
+
+		move.w	#$c40,d1
+		moveq	#$40,d3
+		bsr	Repl2cod
+
+		move.w	#$442,d1
+		moveq	#$42,d3
+		bsr	Repl2cod
+
+		move.w	#$e48,d1
+		moveq	#$48,d3
+		bsr	Repl2cod
+
+		move.w	#$64c,d1
+		moveq	#$4c,d3
+		bsr	Repl2cod
+
+		move.w	#$250,d1
+		moveq	#$50,d3
+		bsr	Repl2cod
+
+		move.w	#$c54,d1
+		moveq	#$54,d3
+		bsr	Repl2cod
+		move.w	d3,$641e
+
+		move.w	#$a58,d1
+		moveq	#$58,d3
+		bsr	Repl2cod
+
+		move.w	#$260,d1
+		moveq	#$60,d3
+		bsr	Repl2cod
+
+		move.w	#$866,d1
+		moveq	#$66,d3
+		bsr	Repl2cod
+
+		move.w	#$a58,d1
+		move.w	#$664,d2
+		move.w	#$260,d3
+		move.w	#$462,d4
+		move.w	#$866,d5
+		move.w	#$442,d6
+		move.w	#$c40,d7
+		bsr	Replace2
+
+		move.w	#$2b7c,d1
+		move.w	#$244,d2
+		moveq	#$44,d3
+		bsr	Replace3
+		move.w	d3,$5e70
+		move.w	d3,$6418
+		bra	RunIt
+
+PatchTun2	movem.l	a0-a4/d0-d5,-(sp)
+		move.w	#$6006,$11e4		;disk access
+		lea	$d30,a1			;access fault fixes
+		lea	$6390,a2
+		move.w	#$4a6d,d1
+		move.w	#$202,d2
+		moveq	#2,d3
+		bsr	Replace
+		moveq	#$e,d1
+		bsr	Replace
+		move.w	d3,$3d30
+		move.w	d3,$454a
+
+		move.w	#$840,d1
+		moveq	#$40,d3
+		bsr	Repl2cod
+
+		move.w	#$e42,d1
+		moveq	#$42,d3
+		bsr	Repl2cod
+
+		move.w	#$648,d1
+		moveq	#$48,d3
+		bsr	Repl2cod
+
+		move.w	#$44c,d1
+		moveq	#$4c,d3
+		bsr	Repl2cod
+
+		move.w	#$250,d1
+		moveq	#$50,d3
+		bsr	Repl2cod
+
+		move.w	#$854,d1
+		moveq	#$54,d3
+		bsr	Repl2cod
+		move.w	d3,$6358
+
+		move.w	#$258,d1
+		moveq	#$58,d3
+		bsr	Repl2cod
+
+		move.w	#$e60,d1
+		moveq	#$60,d3
+		bsr	Repl2cod
+
+		move.w	#$866,d1
+		moveq	#$66,d3
+		bsr	Repl2cod
+
+		move.w	#$258,d1
+		move.w	#$a64,d2
+		move.w	#$e60,d3
+		move.w	#$e62,d4
+		move.w	#$866,d5
+		move.w	#$e42,d6
+		move.w	#$840,d7
+		bsr	Replace2
+
+		move.w	#$2b7c,d1
+		move.w	#$444,d2
+		moveq	#$44,d3
+		bsr	Replace3
+		move.w	d3,$5dac
+		move.w	d3,$6352
+
+		bra	RunIt
+
+PatchTun1	move.w	#$6006,$5832		;disk access
+		movem.l	a0-a4/d0-d5,-(sp)
+		lea	$7d0,a1			;access fault fixes
+		lea	$bd28,a2
+		move.w	#$4a6d,d1
+		move.w	#$602,d2
+		moveq	#2,d3
+		bsr	Replace
+		move.w	d3,$35f8
+		move.w	d3,$3db4
+
+		moveq	#$e,d1
+		bsr	Replace
+
+		move.w	#$0440,d1
+		moveq	#$0040,d3
+		bsr	Repl2cod
+		move.w	#$0c40,d1
+		bsr	Repl2cod
+
+		move.w	#$be42,d1
+		moveq	#$42,d3
+		bsr	Repl2cod
+		move.w	#$0242,d1
+		bsr	Repl2cod
+
+		move.w	#$848,d1
+		moveq	#$48,d3
+		bsr	Repl2cod
+
+		move.w	#$84c,d1
+		moveq	#$4c,d3
+		bsr	Repl2cod
+
+		move.w	#$650,d1
+		moveq	#$50,d3
+		bsr	Repl2cod
+
+		move.w	#$654,d1
+		moveq	#$54,d3
+		bsr	Repl2cod
+		move.w	d3,$5cf2
+
+		move.w	#$e58,d1
+		moveq	#$58,d3
+		bsr	Repl2cod
+
+		move.w	#$c60,d1
+		moveq	#$60,d3
+		bsr	Repl2cod
+
+		move.w	#$a62,d1
+		moveq	#$62,d3
+		bsr	Repl2cod
+
+		move.w	#$264,d1
+		moveq	#$64,d3
+		bsr	Repl2cod
+
+		move.w	#$e66,d1
+		moveq	#$66,d3
+		bsr	Repl2cod
+
+		move.w	#$e58,d1
+		move.w	#$264,d2
+		move.w	#$c60,d3
+		move.w	#$a62,d4
+		move.w	#$e66,d5
+		move.w	#$440,d6
+		move.w	#$242,d7
+		bsr	Replace2
+
+		move.w	#$2b7c,d1
+		move.w	#$444,d2
+		moveq	#$44,d3
+		bsr	Replace3
+		move.w	d3,$5426
+		move.w	d3,$5cec
+RunIt		movem.l	(sp)+,a0-a4/d0-d5
+		movea.w	$ed406,a4
+		jmp	(a5)
+
+GetAdr		lea	$dff000,a6
+		rts
+
+Repl2cod	move.l	a1,a0		;opravuje $xxxxd1d1 => $xxxxd3d3
+Hunt0		move.w	(a0),d5
+		cmp.w	d1,d5
+		bne	skip0
+		move.w	-2(a0),d5
+		cmp.w	#$2b40,d5
+		blt	skip0
+		cmp.w	#$3d50,d5
+		bgt	skip0
+		cmp.w	#$3001,d5
+		beq	skip0
+		cmp.w	#$303a,d5
+		beq	skip0
+		cmp.w	#$3404,d5
+		beq	skip0
+		move.w	d3,(a0)
+skip0		lea	2(a0),a0
+		cmp.l	a2,a0
+		ble	Hunt0
+		rts
+
+Replace		move.l	a1,a0		;opravuje $D1D1D2D2 -> $D1D1D3D3
+Hunt		move.w	(a0)+,d5
+		cmp.w	d1,d5
+		bne	skip
+		move.w	(a0),d5
+		cmp.w	d2,d5
+		bne	skip
+		move.w	d3,(a0)
+skip		cmp.l	a2,a0
+		ble	Hunt
+		rts
+
+Replace2	move.l	a1,a0		;opravuje $3bxxXXXX0558
+Hunt1		cmp.w	#$3b7c,(a0)
+		beq	ast
+		cmp.w	#$3b7a,(a0)
+		beq	ast
+		cmp.w	#$3d7c,(a0)
+		bne	skip1
+ast		move.w	4(a0),d0
+		cmp.w	d1,d0
+		beq	and4
+		cmp.w	d2,d0
+		beq	and4
+		cmp.w	d3,d0
+		beq	and4
+		cmp.w	d4,d0
+		beq	and4
+		cmp.w	d5,d0
+		beq	and4
+		cmp.w	d6,d0
+		beq	and4
+		cmp.w	d7,d0
+		bne	skip1
+and4		and.w	#$00FF,d0
+		move.w	d0,4(a0)
+skip1		lea	2(a0),a0
+		cmp.l	a2,a0
+		ble	Hunt1
+		rts
+
+Replace3	move.l	a1,a0		;D1D1xxxxXXXXD2D2 => D1D1xxxxXXXXD3D3
+Hunt2		move.w	(a0)+,d5
+		cmp.w	d1,d5
+		bne	skip2
+		move.w	4(a0),d5
+		cmp.w	d2,d5
+		bne	skip2
+		move.w	d3,4(a0)
+skip2		cmp.l	a2,a0
+		ble	Hunt2
+		rts
+
+Replace4	move.l	a1,a0		;$D1D1D2D2xxxx => D1D1D2D2D3D3
+Hunt4		move.w	(a0)+,d5
+		cmp.w	d1,d5
+		bne	skip4
+		move.w	(a0),d5
+		cmp.w	d2,d5
+		bne	skip4
+		move.w	d3,2(a0)
+skip4		cmp.l	a2,a0
+		ble	Hunt4
+		rts
+
+Decrunch	move.l	a2,-(sp)
+		lea	Size,a2
 		move.l	a1,(a2)+
 		move.l	6(a0),(a2)
-
 		moveq	#12,d1
-		subq.l	#4,a7
-		lea	(a7),a2
-.loop
-		move.l	4(a2),(a2)+
+		subq.l	#4,sp
+		lea	(sp),a2
+.loop		move.l	4(a2),(a2)+
 		dbf	d1,.loop
-
-		move.l	(a7)+,a2
-
+		move.l	(sp)+,a2
 		addq.l	#6,a0
 		move.l	(a0)+,d1
 		move.l	(a0)+,d2
-
-		pea	Back(pc)
-		move.l	(a7)+,$30(a7)
-
+		pea	Back
+		move.l	(sp)+,$30(sp)
 		rts
-Back
-		movem.l	a0-a1,-(a7)
 
-		lea	Size(pc),a1
+Back		movem.l	a0-a1,-(sp)
+		lea	Size,a1
 		move.l	(a1)+,a0
 		move.l	(a1),a1
 		add.l	a0,a1
-.loop
-		cmp.l	#$48E7E040,(a0)
-		bne.b	.next
 
+.loop		cmp.l	#$48E7E040,(a0)
+		bne.b	.next
 		cmp.l	#$34197000,4(a0)
 		bne.b	.next
-
 		move.w	#$4EF9,(a0)
-		pea	Load(pc)
-		move.l	(a7)+,2(a0)
-.next
-		cmp.l	#$5C882218,(a0)
-		bne.b	.next2
+		pea	Load
+		move.l	(sp)+,2(a0)
 
+.next		cmp.l	#$5C882218,(a0)
+		bne.b	.next2
 		cmp.w	#$2418,4(a0)
 		bne.b	.next2
-
 		move.w	#$4EB9,(a0)
-		pea	Decrunch(pc)
-		move.l	(a7)+,2(a0)
-.next2
-		addq.l	#2,a0
+		pea	Decrunch
+		move.l	(sp)+,2(a0)
+
+.next2		addq.l	#2,a0
 		cmp.l	a0,a1
 		bne.b	.loop
-
-		movem.l	(a7)+,a0-a1
+		movem.l	(sp)+,a0-a1
 		tst.l	d0
 		rts
 
 Size		dc.l	0,0
 
-;--------------------------------
-
-Load
-		movem.l	d0/d2-a6,-(a7)
-
+Load		movem.l	d0/d2-a6,-(sp)
 		moveq	#0,d2
 		move.w	(a1)+,d2
 		addq.b	#1,d2
@@ -197,54 +727,54 @@ Load
 		sub.l	#$230,d0
 		move.l	2(a1),d1
 		and.l	#$FFFFF,d1
-
-		bsr.b	_LoadDisk
-
-		movem.l	(A7)+,d0/d2-a6
-		rts
-
-;--------------------------------
-
-LoadSaveHighs
-		movem.l	d0-a6,-(a7)
-
-		tst.w	$ED414
-		bne.b	.save
-
-		moveq	#0,d0
-		moveq	#$4A,d1
-		moveq	#2,d2
-		bsr.b	_LoadDisk
-		bra.b	.skip
-.save
-		move.l	_keyenabled(pc),D0
-		beq.b	.skip
-
-		moveq	#$4A,d0			;len
-		moveq	#0,d1			;offset
-		lea	(a0),a1			;address
-		lea	_savename(pc),a0	;filename
-		move.l	_resload(pc),a2
-		jsr	resload_SaveFileOffset(a2)
-.skip
-		movem.l	(a7)+,d0-a6
-		moveq	#0,d0
-		rts
-_savename
-		dc.b	'Disk.2',0
-
-;--------------------------------
-
-_resload	dc.l	0		;address of resident loader
-
-;--------------------------------
-; IN:	d0=offset d1=size d2=disk a0=dest
-; OUT:	d0=success
-
-_LoadDisk	movem.l	d0-d1/a0-a2,-(a7)
-		move.l	_resload(pc),a2
+		move.l	_resload,a2
 		jsr	resload_DiskLoad(a2)
-		movem.l	(a7)+,d0-d1/a0-a2
+		movem.l	(sp)+,d0/d2-a6
 		rts
 
-;======================================================================
+LoadPass	movem.l	d0-a6,-(sp)
+		bsr	Params
+		lea	password,a0
+		move.l	a0,a5
+		jsr     (resload_GetFileSize,a2)
+		tst.l	d0
+		beq	NoPass
+		move.l	a5,a0
+		lea	$ece6c,a1
+		jsr	(resload_LoadFile,a2)
+NoPass		movem.l	(sp)+,d0-a6
+		rts
+
+LoadSaveHighs	movem.l	d0-a6,-(sp)
+		tst.w	$ED414
+		bne	.save
+
+		move.l	a0,a5
+		bsr	Params
+                jsr     (resload_GetFileSize,a2)
+                tst.l   d0
+                beq     end
+		bsr	Params
+		move.l	a5,a1
+		jsr	(resload_LoadFile,a2)
+		bra	end
+
+.save		moveq	#$4a,d0			;len
+		lea	(a0),a1			;address
+		bsr	Params
+		jsr	(resload_SaveFile,a2)
+		lea	password,a0
+		lea	$ece6c,a1
+		moveq	#12,d0
+		jsr	(resload_SaveFile,a2)
+end		movem.l	(sp)+,d0-a6
+		moveq	#0,d0
+		rts
+
+Params		lea	_savename,a0
+		move.l	_resload,a2
+		rts
+
+_resload	dc.l	0
+_savename	dc.b	'Highs',0
+password	dc.b	'Password',0
