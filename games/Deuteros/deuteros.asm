@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.9 2001/08/02 19:48:34 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.10 2001/08/28 20:38:55 wepl Exp wepl $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -51,8 +51,7 @@ WPDRIVES	= %1111
 DISKSONBOOT
 ;HRTMON
 ;MEMFREE	= $100
-;NEEDFPU
-;SETPATCH
+SETPATCH
 
 ;============================================================================
 
@@ -64,10 +63,10 @@ EXPMEM		= KICKSIZE+FASTMEMSIZE
 
 _base		SLAVE_HEADER			;ws_Security + ws_ID
 		dc.w	14			;ws_Version
-		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap	;ws_flags
+		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulPriv	;ws_flags
 		dc.l	BASEMEM			;ws_BaseMemSize
 		dc.l	0			;ws_ExecInstall
-		dc.w	_Start-_base		;ws_GameLoader
+		dc.w	_boot-_base		;ws_GameLoader
 		dc.w	0			;ws_CurrentDir
 		dc.w	0			;ws_DontCache
 _keydebug	dc.b	0			;ws_keydebug = F9
@@ -93,11 +92,6 @@ _info		dc.b	"installed & fixed by Wepl",10
 	EVEN
 
 ;============================================================================
-_Start	;	A0 = resident loader
-;============================================================================
-
-	;initialize kickstart and environment
-		bra	_boot
 
 _bootearly
 
