@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.10 2001/08/28 20:38:55 wepl Exp wepl $
+;  :Version.	$Id: deuteros.asm 1.11 2002/05/09 13:45:16 wepl Exp wepl $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -15,6 +15,7 @@
 ;			 cache disabled by default
 ;		07.07.99 reworked for whdload v10
 ;		03.08.01 adapted for kickemu
+;		29.05.02 support for v4 added
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -40,6 +41,7 @@
 		LONG	ACTDISK
 		LONG	DOIO_OS
 		LONG	SIZE3
+		WORD	VER
 
 ;============================================================================
 
@@ -86,7 +88,7 @@ _expmem		dc.l	EXPMEM			;ws_ExpMem
 _name		dc.b	"Deuteros",0
 _copy		dc.b	"1991 Ian Bird",0
 _info		dc.b	"installed & fixed by Wepl",10
-		dc.b	"Version 1.9 "
+		dc.b	"Version 1.10 "
 		INCBIN	"T:date"
 		dc.b	0
 	EVEN
@@ -117,6 +119,8 @@ _bootearly
 		jsr	(resload_CRC16,a3)
 		cmp.w	#$d84b,d0
 		beq	.v1
+		cmp.w	#$a1cb,d0
+		beq	.v4
 		pea	TDREASON_WRONGVER
 		jmp	(resload_Abort,a3)
 
@@ -124,12 +128,18 @@ _bootearly
 		ret	$9ae(a4)		;rn-copylock
 	;delay
 		patch	$12b1a,.delay
+		
+		moveq	#1,d0
+		bra	.vall
 
-	;variables
-		clr.l	$12fdc
-		clr.l	$12ff4
-		move.l	#0,$12ff8		;ioreq
-		clr.l	$12ffc
+.v4
+	;delay
+		patch	$314(a4),.delay
+		
+		moveq	#4,d0
+
+.vall		move.w	d0,VER
+
 	;hook for doio
 		move.l	(4),a0
 		move.l	(_LVODoIO+2,a0),(DOIO_OS)
@@ -137,7 +147,6 @@ _bootearly
 		move.l	a1,(_LVODoIO+2,a0)
 	;start
 		jmp	(a4)
-
 
 .delay		move.w	#200,d0
 .1		btst	#6,$bfe001
@@ -188,6 +197,47 @@ _doio		movem.l	d0-d1/a0-a1,-(a7)
 	;read operation
 .read		cmp.w	#ETD_READ,(IO_COMMAND,a1)
 		bne	.q
+
+	IFEQ 1
+	;save files
+		movem.l	d0-a6,-(a7)
+		lea	.sname,a0
+		move.l	(ACTDISK),d0
+		add.b	#"0",d0
+		move.b	d0,(a0)+
+		move.l	(IO_OFFSET,a1),d0
+		bsr	.itoa
+		move.l	(IO_LENGTH,a1),d0
+		bsr	.itoa
+		move.l	(IO_DATA,a1),d0
+		bsr	.itoa
+		move.l	(IO_LENGTH,a1),d0
+		lea	.sname,a0
+		move.l	(IO_DATA,a1),a1
+		move.l	_resload,a6
+		jsr	(resload_SaveFile,a6)
+		movem.l	(a7)+,d0-a6
+		bra	.s1
+.sname		dc.b	"0-00000-00000-00000",0		;disk offset length data
+.itoa		addq.l	#1,a0
+		swap	d0
+		move.b	.list(PC,d0.w),(a0)+
+		clr.w	d0
+		rol.l	#4,d0
+		move.b	.list(PC,d0.w),(a0)+
+		clr.w	d0
+		rol.l	#4,d0
+		move.b	.list(PC,d0.w),(a0)+
+		clr.w	d0
+		rol.l	#4,d0
+		move.b	.list(PC,d0.w),(a0)+
+		clr.w	d0
+		rol.l	#4,d0
+		move.b	.list(PC,d0.w),(a0)+
+		rts
+.list		dc.b	"0123456789abcdef"
+.s1
+	ENDC
 		
 		movem.l	d0-d4/a2,-(a7)
 		lea	(.base),a0
@@ -221,20 +271,30 @@ _doio		movem.l	d0-d1/a0-a1,-(a7)
 
 ;--------------------------------
 
-.base		dc.l	1,$6ca00,$13000,$6e000,.main-.base	;loaded first time
-		dc.l	1,$55400,$1e000,$79000,.main-.base	;loaded after "reaching stars" sequence
-		dc.l	1,$4200,$20000,$5800,.intro-.base
+		    ;disk,length,data  ,offset,patch
+.base		dc.l	1,$6ca00,$13000,$6e000,.main-.base	;loaded first time			;OK
+		dc.l	1,$55400,$1e000,$79000,.main-.base	;loaded after "reaching stars" sequence	;OK
+		dc.l	1,$4200,$20000,$5800,.intro-.base						;OK
 		dc.l	2,$4200,$20000,$5800,.stars-.base	;"reaching stars"
-		dc.l	2,$1600,$256ce,$25200,.late-.base	;after loding game
+		dc.l	2,$1600,$256ce,$25200,.late1-.base	;after loading game			;OK
+		dc.l	2,$1600,$256c0,$25200,.late4-.base	;after loading game			;OK
 		dc.l	0
 
 	;main exe
-.main		patch	$38818,_disk2		;insert data disk
+.main		cmp.w	#4,VER
+		beq	.main4
+.main1		patch	$38818,_disk2		;insert data disk
 		move.l	#$20000,$3f766		;bad random generator reading from $ff0000
 	;	skip	$130-$116,$38116	;check for savedisk
 		patchs	$38116,_disk3
 		ret	$3867c			;format savedisk
 		move.w	#$4e71,$3fc0e		;sound play fix
+		rts
+.main4		patch	$2580a+$13000,_disk2	;insert data disk
+		move.l	#$20000,$2c756+2+$13000	;bad random generator reading from $ff0000
+		patchs	$25108+$13000,_disk3
+		ret	$2566e+$13000		;format savedisk
+		move.w	#$4e71,$2cc00+$13000	;sound play fix
 		rts
 
 	;intro
@@ -251,11 +311,9 @@ _doio		movem.l	d0-d1/a0-a1,-(a7)
 		rts
 
 	;after late loading (oliver schott)
-.late	;	lea	($7bb7a),a0
-	;	cmp.l	#$ff0000,(a0)		;tries to read from ROM area
-	;	bne	.q
-	;	move.l	#$20000,(a0)		;set to uncritical mem area
-		move.l	#$20000,$7bb7a
+.late1		move.l	#$20000,$7bb7a		;ff0000 -> 20000 tries to read from ROM area
+		rts
+.late4		move.l	#$20000,$7bbd2
 		rts
 
 ;--------------------------------
