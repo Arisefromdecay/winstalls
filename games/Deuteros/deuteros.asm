@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.6 1998/10/15 23:42:19 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.7 1998/12/16 19:07:14 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -13,6 +13,7 @@
 ;			 new patch routine
 ;		16.12.98 on second version also bad version requester appears
 ;			 cache disabled by default
+;		07.07.99 reworked for whdload v10
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -22,12 +23,13 @@
 
 	INCDIR	Includes:
 	INCLUDE	whdload.i
+	INCLUDE	whdmacros.i
 	INCLUDE	exec/io.i
 	INCLUDE	devices/trackdisk.i
 	INCLUDE	lvo/exec.i
 
 	IFD	BARFLY
-	OUTPUT	"wart:d-f/deuteros/Deuteros.Slave"
+	OUTPUT	"wart:d-e/deuteros/Deuteros.Slave"
 	BOPT	O+ OG+				;enable optimizing
 	BOPT	ODd- ODe-			;disable mul optimizing
 	BOPT	w4-				;disable 64k warnings
@@ -43,7 +45,7 @@
 ;============================================================================
 
 _base		SLAVE_HEADER			;ws_Security + ws_ID
-		dc.w	7			;ws_Version
+		dc.w	10			;ws_Version
 		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap	;ws_flags
 		dc.l	$100000			;ws_BaseMemSize
 		dc.l	0			;ws_ExecInstall
@@ -52,15 +54,25 @@ _base		SLAVE_HEADER			;ws_Security + ws_ID
 		dc.w	0			;ws_DontCache
 _keydebug	dc.b	0			;ws_keydebug = F9
 _keyexit	dc.b	$59			;ws_keyexit = F10
+_expmem		dc.l	0			;ws_ExpMem
+		dc.w	_name-_base		;ws_name
+		dc.w	_copy-_base		;ws_copy
+		dc.w	_info-_base		;ws_info
 
 ;============================================================================
 
-	IFD	BARFLY
-		dc.b	"$VER: Deuteros.Slave 1.7 by Wepl "
-	DOSCMD	"WDate >T:date"
-	INCBIN	"T:date"
-		dc.b	0
+	IFND	.passchk
+	DOSCMD	"WDate  >T:date"
+.passchk
 	ENDC
+
+_data		dc.b	"data",0
+_name		dc.b	"Deuteros",0
+_copy		dc.b	"1991 Ian Bird",0
+_info		dc.b	"installed & fixed by Wepl",10
+		dc.b	"Version 1.8 "
+		INCBIN	"T:date"
+		dc.b	0
 	EVEN
 
 ;============================================================================
