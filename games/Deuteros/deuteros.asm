@@ -2,8 +2,11 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.1 1998/05/25 15:45:29 jah Exp $
+;  :Version.	$Id: deuteros.asm 1.2 1998/07/15 21:52:56 jah Exp jah $
 ;  :History.	14.05.98 started
+;		10.08.98 reading from second disk fixed
+;		02.09.98 sound play fixed
+;		05.09.98 icache enabled
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -25,17 +28,22 @@
 	SUPER
 	ENDC
 
+ACTDISK		= $100
+DOIO_OS		= ACTDISK+4
+RESLOAD		= DOIO_OS+4
+SIZE3		= RESLOAD+4
+
 ;============================================================================
 
 _base		SLAVE_HEADER			;ws_Security + ws_ID
 		dc.w	7			;ws_Version
 		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap	;ws_flags
-_basememsize	dc.l	$100000			;ws_BaseMemSize
+		dc.l	$100000			;ws_BaseMemSize
 		dc.l	0			;ws_ExecInstall
 		dc.w	_Start-_base		;ws_GameLoader
 		dc.w	0			;ws_CurrentDir
 		dc.w	0			;ws_DontCache
-_keydebug	dc.b	$58			;ws_keydebug = F9
+_keydebug	dc.b	0			;ws_keydebug = F9
 _keyexit	dc.b	$59			;ws_keyexit = F10
 
 ;============================================================================
@@ -52,15 +60,21 @@ _keyexit	dc.b	$59			;ws_keyexit = F10
 _Start	;	A0 = resident loader
 ;============================================================================
 
-		lea	(_resload,pc),a1
-		move.l	a0,(a1)			;save for later using
+		move.l	a0,(RESLOAD)			;save for later using
+
+	;enable cache
+		move.l	#CACRF_EnableI,d0		;enable instruction cache
+		move.l	d0,d1    			;mask
+		jsr	(resload_SetCACR,a0)
+
+	;init vars
+		move.l	#0,ACTDISK
 
 	;get savedisksize
 		lea	(_disk3),a0
-		move.l	(_resload),a1
+		move.l	(RESLOAD),a1
 		jsr	(resload_GetFileSize,a1)
-		lea	(_size3),a0
-		move.l	d0,(a0)
+		move.l	d0,(SIZE3)
 		
 	;clear mem for title picture
 		lea	$8ab00,a0
@@ -73,32 +87,54 @@ _Start	;	A0 = resident loader
 		lea	(_osemu,pc),a0		;filename of the osemu module
 		lea	$400,a1			;the address on which you have
 						;assembled the osemu module
-		move.l	(_resload,pc),a2	;the resload base
+		move.l	(RESLOAD),a2		;the resload base
 		jsr	(resload_LoadFileDecrunch,a2)	;this allows to
 						;compress the osemu
 	;init the osemu module
-		move.l	(_resload,pc),a0	;the resload base
+		move.l	a2,a0			;the resload base
 		lea	(_base,pc),a1		;the slave structure
 		jsr	$400
 
 	;start the program
 		move	#0,sr			;if the program uses the os it
 						;should executed in user mode
-
 	;bootblock stuff
 		move.l	#$2c00,d0		;offset
 		move.l	#$2c00,d1		;size
 		moveq	#1,d2			;disk
 		lea	$12800,a0		;destination
 		move.l	a0,a4
-		move.l	(_resload),a1
-		jsr	(resload_DiskLoad,a1)
+		move.l	(RESLOAD),a3
+		jsr	(resload_DiskLoad,a3)
+		move.l	#$2c00,d0
+		move.l	a4,a0
+		jsr	(resload_CRC16,a3)
+		cmp.w	#$d84b,d0
+		beq	.v1
+		cmp.w	#$8ab8,d0
+		beq	.v2
+		bra	_badver
+
+.v1	;some fixes
+		ret	$9ae(a4)		;rn-copylock
+	;delay
+		patch	$12b1a,.delay
+		bra	.vall
+
+.v2		lea	$12800,a0
+		lea	$12500,a1
+		move.l	a1,a4
+		move.l	#$2c00,d0
+.v2_1		move.l	(a0)+,(a1)+
+		subq.l	#4,d0
+		bne	.v2_1
+	illegal
+.vall
+	;variables
 		clr.l	$12fdc
 		clr.l	$12ff4
 	;	move.l	$300,$12ff8		;ioreq
 		clr.l	$12ffc
-	;some fixes
-		ret	$9ae(a4)		;rn-copylock
 	;reset colors
 		lea	(_custom+color),a0
 		moveq	#32/2-1,d0
@@ -106,39 +142,56 @@ _Start	;	A0 = resident loader
 		dbf	d0,.cl2
 	;hook for doio
 		move.l	(4),a0
-		lea	(_doios),a1
-		move.l	(_LVODoIO+2,a0),(a1)
+		move.l	(_LVODoIO+2,a0),(DOIO_OS)
 		lea	(_doio),a1
 		move.l	a1,(_LVODoIO+2,a0)
 	;start
 		jmp	(a4)
 
+
+.delay		move.w	#200,d0
+.1		btst	#6,$bfe001
+		beq	.2
+		btst	#7,$bfe001
+		beq	.2
+		waitvb
+		dbf	d0,.1
+.2		move.w	$12a34,d0		;original
+		rts
+
 ;--------------------------------
 
-_doio		cmp.l	#$2063e,a1		;savedisk ?
+_doio		move.l	ACTDISK,(IO_UNIT,a1)
+		cmp.l	#$2063e,a1		;savedisk ?
 		bne	.go
+	;savedisk
 		move.l	#2,(IO_UNIT,a1)		;saving to disk #3
-		lea	(_size3),a0
-		cmp.w	#ETD_READ,(IO_COMMAND,a1)
-		beq	.read
 		cmp.w	#ETD_WRITE,(IO_COMMAND,a1)
-		bne	.fail
-
-.write		move.l	(IO_OFFSET,a1),d0
-		add.l	(IO_LENGTH,a1),d0
-		cmp.l	(a0),d0
-		blo	.go
-		move.l	d0,(a0)
-		bra	.go
-
-.read		move.l	(IO_OFFSET,a1),d0
-		add.l	(IO_LENGTH,a1),d0
-		cmp.l	(a0),d0
-		bhi	.clr
-
-.go		move.l	(_doios),a0
-		jsr	(a0)
+		beq	.go
 		cmp.w	#ETD_READ,(IO_COMMAND,a1)
+		bne	.fail
+	;check read size
+		move.l	(IO_OFFSET,a1),d0
+		add.l	(IO_LENGTH,a1),d0
+		cmp.l	(SIZE3),d0
+		bhi	.clr
+	;enter osemu function
+.go		move.l	(DOIO_OS),a0
+		jsr	(a0)
+	;check command
+		cmp.w	#ETD_WRITE,(IO_COMMAND,a1)
+		bne	.read
+	;write operation
+		tst.b	(IO_ERROR,a1)		;success ?
+		bne	.q
+		move.l	(IO_OFFSET,a1),d0
+		add.l	(IO_LENGTH,a1),d0
+		cmp.l	(SIZE3),d0		;enlarged ?
+		blo	.q
+		move.l	d0,(SIZE3)		;new disk 3 size
+		bra	.q
+	;read operation
+.read		cmp.w	#ETD_READ,(IO_COMMAND,a1)
 		bne	.q
 		cmp.l	#$4200,(IO_LENGTH,a1)
 		beq	.2
@@ -148,6 +201,8 @@ _doio		cmp.l	#$2063e,a1		;savedisk ?
 .1		patch	$38818,_disk2		;insert data disk
 		patch	$3f764,_random
 		skip	$130-$116,$38116	;check for savedisk
+		ret	$3867c			;format savedisk
+		move.w	#$4e71,$3fc0e		;sound play fix
 		bra	.q
 	;intro
 .2		ret	$2080c			;access fault
@@ -157,8 +212,7 @@ _doio		cmp.l	#$2063e,a1		;savedisk ?
 .fail		st	(IO_ERROR,a1)
 		rts
 
-.clr	blitz
-		move.l	(IO_DATA,a1),a0
+.clr		move.l	(IO_DATA,a1),a0
 		move.l	(IO_LENGTH,a1),d0
 .c		clr.l	(a0)+
 		subq.l	#4,d0
@@ -168,7 +222,7 @@ _doio		cmp.l	#$2063e,a1		;savedisk ?
 
 ;--------------------------------
 
-_disk2		addq.l	#1,($206a0+IO_UNIT)
+_disk2		move.l	#1,ACTDISK
 		rts
 
 _random		lea	($3f760),a0
@@ -181,9 +235,15 @@ _random		lea	($3f760),a0
 
 ;--------------------------------
 
-_resload	dc.l	0			;address of resident loader
-_doios		dc.l	0
-_size3		dc.l	0
+_badver		pea	TDREASON_WRONGVER.w
+		bra	_end
+_end		move.l	(RESLOAD),-(a7)
+		add.l	#resload_Abort,(a7)
+		rts
+
+;--------------------------------
+
+_version	dc.w	1
 _disk3		dc.b	"Disk.3",0
 _osemu		dc.b	"OSEmu.400",0
 
