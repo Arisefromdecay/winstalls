@@ -2,12 +2,14 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.3 1998/09/05 10:55:42 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.4 1998/09/25 12:03:15 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
 ;		05.09.98 icache enabled
 ;		23.09.98 access fault late in the game fixed (olivier schott)
+;		30.09.98 first patch for random routine changed
+;		08.10.98 patch for "reaching stars" sequence added, new patch routine
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -200,28 +202,25 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 	;read operation
 .read		cmp.w	#ETD_READ,(IO_COMMAND,a1)
 		bne	.q
-		cmp.l	#$4200,(IO_LENGTH,a1)
-		beq	.2
-		cmp.l	#$25200,(IO_OFFSET,a1)
-		beq	.3
-		cmp.l	#$13000,(IO_DATA,a1)
-		bne	.q
-	;main exe
-.1		patch	$38818,_disk2		;insert data disk
-		patch	$3f764,_random
-		skip	$130-$116,$38116	;check for savedisk
-		ret	$3867c			;format savedisk
-		move.w	#$4e71,$3fc0e		;sound play fix
-		bra	.q
-	;intro
-.2		ret	$2080c			;access fault
-		bra	.q
-.3	;after late loading (oliver schott)
-		lea	($7bb7a),a0
-		cmp.l	#$ff0000,(a0)		;tries to read from ROM area
-		bne	.q
-		move.l	#$20000,(a0)		;set to uncritical mem area
-	;return
+		
+		movem.l	d0-d4/a2,-(a7)
+		lea	(.base),a0
+		move.l	a0,a2
+.next		movem.l	(a0)+,d0-d4
+		tst.l	d0
+		beq	.end
+		subq.l	#1,d0
+		cmp.l	(ACTDISK),d0
+		bne	.next
+		cmp.l	(IO_LENGTH,a1),d1
+		bne	.next
+		cmp.l	(IO_DATA,a1),d2
+		bne	.next
+		cmp.l	(IO_OFFSET,a1),d3
+		bne	.next
+		jsr	(a2,d4.l)
+.end		movem.l	(a7)+,d0-d4/a2
+
 .q		rts
 
 .fail		st	(IO_ERROR,a1)
@@ -237,15 +236,45 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 
 ;--------------------------------
 
-_disk2		move.l	#1,ACTDISK
+.base		dc.l	1,$6ca00,$13000,$6e000,.main-.base	;loaded first time
+		dc.l	1,$55400,$1e000,$79000,.main-.base	;loaded after "reaching stars" sequence
+		dc.l	1,$4200,$20000,$5800,.intro-.base
+		dc.l	2,$4200,$20000,$5800,.stars-.base	;"reaching stars"
+		dc.l	2,$1600,$256ce,$25200,.late-.base	;after loding game
+		dc.l	0
+
+	;main exe
+.main		patch	$38818,_disk2		;insert data disk
+		move.l	#$20000,$3f766		;bad random generator reading from $ff0000
+		skip	$130-$116,$38116	;check for savedisk
+		ret	$3867c			;format savedisk
+		move.w	#$4e71,$3fc0e		;sound play fix
 		rts
 
-_random		lea	($3f760),a0
-		move.w	(vhposr+_custom),d0
-		add.w	(a0),d0
-		ror.w	#1,d0
-		move.w	d0,(a0)
-		and.w	#$ff,d0
+	;intro
+.intro		ret	$2080c			;access fault (intro)
+		rts
+
+	;"reaching stars"
+.stars		patchs	$2085c,.af1
+		rts
+.af1		clr.w	$2174c			;access fault (extro)
+		clr.w	$21750			;access fault (extro)
+		clr.l	ACTDISK
+		move.l	$2174c,a0		;original
+		rts
+
+	;after late loading (oliver schott)
+.late	;	lea	($7bb7a),a0
+	;	cmp.l	#$ff0000,(a0)		;tries to read from ROM area
+	;	bne	.q
+	;	move.l	#$20000,(a0)		;set to uncritical mem area
+		move.l	#$20000,$7bb7a
+		rts
+
+;--------------------------------
+
+_disk2		move.l	#1,ACTDISK
 		rts
 
 ;--------------------------------
