@@ -2,14 +2,15 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.4 1998/09/25 12:03:15 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.5 1998/10/08 00:44:52 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
 ;		05.09.98 icache enabled
 ;		23.09.98 access fault late in the game fixed (olivier schott)
 ;		30.09.98 first patch for random routine changed
-;		08.10.98 patch for "reaching stars" sequence added, new patch routine
+;		08.10.98 patch for "reaching stars" sequence added (Björn Hagström)
+;			 new patch routine
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
