@@ -1,6 +1,6 @@
 ;*---------------------------------------------------------------------------
 ;  :Program.	Stardust.asm
-;  :Contents.	Slave for "Stardust" from Blood House
+;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
@@ -13,6 +13,11 @@
 ;               11.12.2000 - tunnel 4 faults removed
 ;                          - special missions fixed
 ;               13.12.2000 - access fault in outro fixed
+;                          - quit routine for outro added
+;               19.12.2000 - intro - blitter waits added
+;                          - boot - cacr+vbr access removed
+;                          - skip intro option added (custom1)
+;                          - quit routine removed - useless
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -43,11 +48,13 @@ _expmem		dc.l	0		;ws_ExpMem
 _name		dc.b	"Stardust",0
 _copy		dc.b	"1993 Bloodhouse",0
 _info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal",10
-		dc.b	"V1.2 (29-Nov-2000)",0
+		dc.b	"V1.3 (19-Dec-2000)",0
 
 Start		lea	_resload,a1
 		move.l	a0,(a1)
 		move.l	a0,a2
+                lea     (_tags,pc),a0
+                jsr     (resload_Control,a2)
 
 		lea	$7000,a0
 		move.l	a0,a5
@@ -56,22 +63,31 @@ Start		lea	_resload,a1
 		moveq	#1,d2
 		jsr	resload_DiskLoad(a2)
 
-		move.w	#$4EF9,$29C(a5)
-		pea	Patch
+		lea	intro,a0
+		tst.l	(a0)
+		beq	PatchBoot
+		move.b	#$60,$18e(a5)		;skip intro
+PatchBoot	move.w	#$4eb9,$22a(a5)
+		pea	PatchIntro
+		move.l	(sp)+,$22c(a5)
+
+		move.w	#$4ef9,$29C(a5)
+		pea	PatchGame
 		move.l	(sp)+,$29E(a5)
 
-		move.w	#$4EF9,$686(a5)
+		move.w	#$4ef9,$686(a5)
 		pea	Load
 		move.l	(sp)+,$688(a5)
 
 		move.w	#$602c,$158(a5)		;disk access
+		move.w	#$600c,$d2(a5)		;vbr+cacr operation
 
 		moveq	#0,d1			; attn flag
 		move.l	a5,d6			; loader address
 		move.l	#$80000-$400,d7		; ext mem
 		jmp	$C4(A5)
 
-Patch		move.l	$782E4,a5
+PatchGame	move.l	$782E4,a5
 		move.w	#$F080,$4404(a5)	;remove access faults
 		move.w	#$F084,$1778(a5)
 		move.w	#$F084,$2e74(a5)
@@ -126,7 +142,7 @@ Patch		move.l	$782E4,a5
 		move.l	(sp),$ec7d2
 		move.l	(sp)+,$666a(a5)
 
-		move.w	#$4E75,$4016(a5)	;no cartridge check
+		move.w	#$4e75,$4016(a5)	;no cartridge check
 
 		move.l	a5,a0			;80000
 		lea	$f0000,a2
@@ -774,7 +790,27 @@ end		movem.l	(sp)+,d0-a6
 Params		lea	_savename,a0
 		move.l	_resload,a2
 		rts
+PatchIntro	lea	$80000,a4
+		move.l	#$4e714eb9,$275a(a4)
+		pea	BlitFix
+		move.l	(sp)+,$275e(a4)
+
+		move.w	#$4ef9,$277e(a4)
+		pea	BlitFix2
+		move.l	(sp)+,$2780(a4)
+		jmp	(a4)
+
+BlitFix		bsr	BlitWait
+		move.l	$86ef0,$dff054
+		rts
+
+BlitFix2	move.w	#$202c,$dff058
+BlitWait	btst	#6,$dff002
+		bne	BlitWait
+		rts
 
 _resload	dc.l	0
+_tags		dc.l	WHDLTAG_CUSTOM1_GET
+intro		dc.l    0
 _savename	dc.b	'Highs',0
 password	dc.b	'Password',0
