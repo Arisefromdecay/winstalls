@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: interphase.asm 1.5 1998/05/03 20:33:42 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.1 1998/05/25 15:45:29 jah Exp $
 ;  :History.	14.05.98 started
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
@@ -13,7 +13,9 @@
 
 	INCDIR	Includes:
 	INCLUDE	whdload.i
-	INCLUDE	macros/ntypes.i
+	INCLUDE	exec/io.i
+	INCLUDE	devices/trackdisk.i
+	INCLUDE	lvo/exec.i
 
 	IFD	BARFLY
 	OUTPUT	"wart:deuteros/deuteros.slave"
@@ -26,9 +28,9 @@
 ;============================================================================
 
 _base		SLAVE_HEADER			;ws_Security + ws_ID
-		dc.w	5			;ws_Version
-		dc.w	WHDLF_Disk|WHDLF_NoError	;ws_flags
-_basememsize	dc.l	$80000			;ws_BaseMemSize
+		dc.w	7			;ws_Version
+		dc.w	WHDLF_Disk|WHDLF_NoError|WHDLF_EmulTrap	;ws_flags
+_basememsize	dc.l	$100000			;ws_BaseMemSize
 		dc.l	0			;ws_ExecInstall
 		dc.w	_Start-_base		;ws_GameLoader
 		dc.w	0			;ws_CurrentDir
@@ -53,154 +55,137 @@ _Start	;	A0 = resident loader
 		lea	(_resload,pc),a1
 		move.l	a0,(a1)			;save for later using
 
-	INCLUDE	lvo/exec.i
-	INCLUDE	devices/trackdisk.i
-	INCLUDE	lvo/graphics.i
-	INCLUDE	graphics/gfx.i
-	INCLUDE	graphics/view.i
-
-	STRUCTURE	emu,$400
-		STRUCT	exec_jmp,-_LVOCopyMemQuick
-		STRUCT	exec,588
-		STRUCT	gfx_jmp,-_LVOBltBitMapRastPort
-		STRUCT	gfx,242
-		ALIGNLONG
-		STRUCT	coplc,200
-		LABEL	emu_SIZEOF
+	;get savedisksize
+		lea	(_disk3),a0
+		move.l	(_resload),a1
+		jsr	(resload_GetFileSize,a1)
+		lea	(_size3),a0
+		move.l	d0,(a0)
 		
-		lea	(exec_jmp),a0
-.ce		move.w	#$4afc,(a0)+
-		cmp.l	#exec,a0
-		bne	.ce
-.ie		clr.w	(a0)+
-		cmp.l	#gfx_jmp,a0
-		bne	.ie
-.cg		move.w	#$4afc,(a0)+
-		cmp.l	#gfx,a0
-		bne	.cg
-.ig		clr.w	(a0)+
-		cmp.l	#emu_SIZEOF,a0
-		bne	.ig
+	;clear mem for title picture
+		lea	$8ab00,a0
+		lea	$92800,a1
+.cl		clr.l	(a0)+
+		cmp.l	a0,a1
+		bne	.cl
 
-		lea	(exec),a6
-		move.l	a6,(4)
-		ret	_LVOSuperState(a6)
-		patch	_LVOUserState(a6),_UserState
-		ret	_LVOFindTask(a6)
-		ret	_LVOAddPort(a6)
-		patch	_LVOOpenDevice(a6),_OpenDevice
-		patch	_LVOOpenLibrary(a6),_OpenLibrary
-		patch	_LVOAvailMem(a6),_AvailMem
-		patch	_LVODoIO(a6),_DoIO
-		bra	_exec_end
+	;load the osemu module
+		lea	(_osemu,pc),a0		;filename of the osemu module
+		lea	$400,a1			;the address on which you have
+						;assembled the osemu module
+		move.l	(_resload,pc),a2	;the resload base
+		jsr	(resload_LoadFileDecrunch,a2)	;this allows to
+						;compress the osemu
+	;init the osemu module
+		move.l	(_resload,pc),a0	;the resload base
+		lea	(_base,pc),a1		;the slave structure
+		jsr	$400
 
-_UserState	move.l	(a7),a0
-		move.l	d0,a7
-		jmp	(a0)
-_OpenDevice	move.l	d0,(IO_UNIT,a1)
-		moveq	#0,d0
-		rts
-_OpenLibrary	move.l	#gfx,d0
-		cmp.l	#"grap",(a1)
-		beq	.ret
-		illegal
-.ret		rts
-_AvailMem	btst	#2,d1
-		bne	.retzero
-		move.l	(_basememsize),d0
-		sub.l	#$2000,d0
-		rts
-.retzero	moveq	#0,d0
-		rts
-_DoIO		cmp.w	#TD_MOTOR,(IO_COMMAND,a1)
-		beq	.ret
-		illegal
-.ret
-_exec_end
+	;start the program
+		move	#0,sr			;if the program uses the os it
+						;should executed in user mode
 
-		lea	(gfx),a6
-		patch	_LVOInitView(a6),_InitView
-		patch	_LVOInitVPort(a6),_InitVPort
-		patch	_LVOInitBitMap(a6),_InitBitMap
-		patch	_LVOInitRastPort(a6),_InitRastPort
-		patch	_LVOMakeVPort(a6),_MakeVPort
-		patch	_LVOMrgCop(a6),_MrgCop
-		patch	_LVOLoadView(a6),_LoadView
-		bra	_gfx_end
-
-_InitBitMap	move.b	d0,(bm_Depth,a0)
-		lsr.w	#3,d1
-		move.w	d1,(bm_BytesPerRow,a0)
-		move.w	d2,(bm_Rows,a0)
-_InitView
-_InitVPort
-_InitRastPort
-_MakeVPort
-_MrgCop		rts
-_LoadView					;a1 = view
-		move.l	(v_ViewPort,a1),a0
-		move.l	(vp_RasInfo,a0),a0
-		move.l	(ri_BitMap,a0),a0
-		lea	(coplc),a1
-		move.l	#diwstrt<<16+$2981,(a1)+
-		move.l	#diwstop<<16+$f1c1,(a1)+	;320x200
-		move.l	#ddfstrt<<16+$0038,(a1)+
-		move.l	#ddfstop<<16+$00d0,(a1)+
-		move.w	#bplcon0,(a1)+
-		move.b	(bm_Depth,a0),d0
-		ror.w	#4,d0
-		or.w	#$200,d0
-		move.w	d0,(a1)+
-		move.l	#bplcon1<<16,(a1)+
-		move.l	#bpl1mod<<16,(a1)+
-		move.l	#bpl2mod<<16,(a1)+
-		
-		move.b	(bm_Depth,a0),d0
-		lea	(bm_Planes,a0),a0
-		move.w	#bplpt,d1
-.lp		move.w	d1,(a1)+
-		addq.w	#2,d1
-		move.w	(a0)+,(a1)+
-		move.w	d1,(a1)+
-		addq.w	#2,d1
-		move.w	(a0)+,(a1)+
-		subq.b	#1,d0
-		bne	.lp
-		
-		move.l	#-2,(a1)+
-		move.l	#coplc,(_custom+cop1lc)
-		waitvb
-		move.w	#DMAF_SETCLR|DMAF_MASTER|DMAF_RASTER|DMAF_COPPER,(_custom+dmacon)
-		rts
-_gfx_end
-
+	;bootblock stuff
 		move.l	#$2c00,d0		;offset
 		move.l	#$2c00,d1		;size
 		moveq	#1,d2			;disk
 		lea	$12800,a0		;destination
+		move.l	a0,a4
 		move.l	(_resload),a1
 		jsr	(resload_DiskLoad,a1)
-		
 		clr.l	$12fdc
 		clr.l	$12ff4
-		move.l	$300,$12ff8		;ioreq
+	;	move.l	$300,$12ff8		;ioreq
 		clr.l	$12ffc
-		
-		lea	$12800,a4
-		ill	$1446(a4)
-		
+	;some fixes
+		ret	$9ae(a4)		;rn-copylock
+	;reset colors
+		lea	(_custom+color),a0
+		moveq	#32/2-1,d0
+.cl2		clr.l	(a0)+
+		dbf	d0,.cl2
+	;hook for doio
+		move.l	(4),a0
+		lea	(_doios),a1
+		move.l	(_LVODoIO+2,a0),(a1)
+		lea	(_doio),a1
+		move.l	a1,(_LVODoIO+2,a0)
+	;start
 		jmp	(a4)
-		
+
 ;--------------------------------
 
-_exit		pea	TDREASON_OK
-		move.l	(_resload),-(a7)
-		add.l	#resload_Abort,(a7)
+_doio		cmp.l	#$2063e,a1		;savedisk ?
+		bne	.go
+		move.l	#2,(IO_UNIT,a1)		;saving to disk #3
+		lea	(_size3),a0
+		cmp.w	#ETD_READ,(IO_COMMAND,a1)
+		beq	.read
+		cmp.w	#ETD_WRITE,(IO_COMMAND,a1)
+		bne	.fail
+
+.write		move.l	(IO_OFFSET,a1),d0
+		add.l	(IO_LENGTH,a1),d0
+		cmp.l	(a0),d0
+		blo	.go
+		move.l	d0,(a0)
+		bra	.go
+
+.read		move.l	(IO_OFFSET,a1),d0
+		add.l	(IO_LENGTH,a1),d0
+		cmp.l	(a0),d0
+		bhi	.clr
+
+.go		move.l	(_doios),a0
+		jsr	(a0)
+		cmp.w	#ETD_READ,(IO_COMMAND,a1)
+		bne	.q
+		cmp.l	#$4200,(IO_LENGTH,a1)
+		beq	.2
+		cmp.l	#$13000,(IO_DATA,a1)
+		bne	.q
+	;main exe
+.1		patch	$38818,_disk2		;insert data disk
+		patch	$3f764,_random
+		skip	$130-$116,$38116	;check for savedisk
+		bra	.q
+	;intro
+.2		ret	$2080c			;access fault
+	;return
+.q		rts
+
+.fail		st	(IO_ERROR,a1)
+		rts
+
+.clr	blitz
+		move.l	(IO_DATA,a1),a0
+		move.l	(IO_LENGTH,a1),d0
+.c		clr.l	(a0)+
+		subq.l	#4,d0
+		bhi	.c
+		sf	(IO_ERROR,a1)
+		rts
+
+;--------------------------------
+
+_disk2		addq.l	#1,($206a0+IO_UNIT)
+		rts
+
+_random		lea	($3f760),a0
+		move.w	(vhposr+_custom),d0
+		add.w	(a0),d0
+		ror.w	#1,d0
+		move.w	d0,(a0)
+		and.w	#$ff,d0
 		rts
 
 ;--------------------------------
 
 _resload	dc.l	0			;address of resident loader
+_doios		dc.l	0
+_size3		dc.l	0
+_disk3		dc.b	"Disk.3",0
+_osemu		dc.b	"OSEmu.400",0
 
 ;============================================================================
 
