@@ -2,7 +2,7 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.8 1999/07/07 20:15:55 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.9 2001/08/02 19:48:34 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
@@ -43,38 +43,16 @@
 
 ;============================================================================
 
-; number of floppy drives:
-;	sets the number of floppy drives, valid values are 0-4.
-;	0 means that the number is specified via option Custom1/N
-NUMDRIVES=1
-
-; protection state for floppy disks:
-;	0 means 'write protected', 1 means 'read/write'
-;	bit 0 means drive DF0:, bit 3 means drive DF3:
-WPDRIVES=%1111
-
-; disable fpu support:
-;	results in a different task switching routine, if fpu is enabled also
-;	the fpu status will be saved and restored.
-;	for better compatibility and performance the fpu should be disabled
-NOFPU
-
-; enable debug support for hrtmon:
-;	hrtmon reads to much from the stackframe if entered, if the ssp is at
-;	the end hrtmon will create a access fault.
-;	for better compatibility this option should be disabled
-;HRTMON
-
-; calculate minimal amount of free memory
-;	if the symbol MEMFREE is defined after each call to exec.AllocMem the
-;	size of the largest free memory chunk will be calculated and saved at
-;	the specified address if lower than the previous saved value (chipmem
-;	at MEMFREE, fastmem at MEMFREE+4)
-;MEMFREE=$100
-
-; amount of memory available for the system
 CHIPMEMSIZE	= $100000
 FASTMEMSIZE	= 0
+NUMDRIVES	= 1
+WPDRIVES	= %1111
+
+DISKSONBOOT
+;HRTMON
+;MEMFREE	= $100
+;NEEDFPU
+;SETPATCH
 
 ;============================================================================
 
