@@ -2,11 +2,12 @@
 ;  :Program.	deuteros.asm
 ;  :Contents.	Slave for "Deuteros"
 ;  :Author.	Wepl
-;  :Version.	$Id: deuteros.asm 1.2 1998/07/15 21:52:56 jah Exp jah $
+;  :Version.	$Id: deuteros.asm 1.3 1998/09/05 10:55:42 jah Exp jah $
 ;  :History.	14.05.98 started
 ;		10.08.98 reading from second disk fixed
 ;		02.09.98 sound play fixed
 ;		05.09.98 icache enabled
+;		23.09.98 access fault late in the game fixed (olivier schott)
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -21,17 +22,18 @@
 	INCLUDE	lvo/exec.i
 
 	IFD	BARFLY
-	OUTPUT	"wart:deuteros/deuteros.slave"
+	OUTPUT	"wart:d-l/deuteros/deuteros.slave"
 	BOPT	O+ OG+				;enable optimizing
 	BOPT	ODd- ODe-			;disable mul optimizing
 	BOPT	w4-				;disable 64k warnings
 	SUPER
 	ENDC
 
-ACTDISK		= $100
-DOIO_OS		= ACTDISK+4
-RESLOAD		= DOIO_OS+4
-SIZE3		= RESLOAD+4
+	STRUCTURE	globals,$100
+		LONG	ACTDISK
+		LONG	DOIO_OS
+		LONG	RESLOAD
+		LONG	SIZE3
 
 ;============================================================================
 
@@ -121,7 +123,9 @@ _Start	;	A0 = resident loader
 		patch	$12b1a,.delay
 		bra	.vall
 
-.v2		lea	$12800,a0
+.v2
+	IFEQ 0
+		lea	$12800,a0
 		lea	$12500,a1
 		move.l	a1,a4
 		move.l	#$2c00,d0
@@ -129,6 +133,9 @@ _Start	;	A0 = resident loader
 		subq.l	#4,d0
 		bne	.v2_1
 	illegal
+	ELSE
+		bra	_badver
+	ENDC
 .vall
 	;variables
 		clr.l	$12fdc
@@ -195,6 +202,8 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 		bne	.q
 		cmp.l	#$4200,(IO_LENGTH,a1)
 		beq	.2
+		cmp.l	#$25200,(IO_OFFSET,a1)
+		beq	.3
 		cmp.l	#$13000,(IO_DATA,a1)
 		bne	.q
 	;main exe
@@ -206,6 +215,12 @@ _doio		move.l	ACTDISK,(IO_UNIT,a1)
 		bra	.q
 	;intro
 .2		ret	$2080c			;access fault
+		bra	.q
+.3	;after late loading (oliver schott)
+		lea	($7bb7a),a0
+		cmp.l	#$ff0000,(a0)		;tries to read from ROM area
+		bne	.q
+		move.l	#$20000,(a0)		;set to uncritical mem area
 	;return
 .q		rts
 
