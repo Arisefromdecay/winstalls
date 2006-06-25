@@ -1,7 +1,7 @@
 ;*---------------------------------------------------------------------------
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
-;  :Author.	Mr.Larmer of Wanted Team, Bored Seal
+;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -20,6 +20,9 @@
 ;               09.01.2001 - my bug in loader removed (intro sound works now)
 ;                          - outro quit routine removed - useless
 ;			   - game - 4x blitter waits added
+;		25.06.2006 Wepl
+;			termination of taglist for resload_Control fixed to
+;			work with WHDLoad v16.6
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -30,6 +33,16 @@
 		INCDIR	Include:
 		INCLUDE	whdload.i
 		INCLUDE	whdmacros.i
+
+	IFD BARFLY
+	OUTPUT	"wart:st/stardust/Stardust.Slave"
+	BOPT	O+				;enable optimizing
+	BOPT	OG+				;enable optimizing
+	BOPT	ODd-				;disable mul optimizing
+	BOPT	ODe-				;disable mul optimizing
+	BOPT	w4-				;disable 64k warnings
+	SUPER
+	ENDC
 
 base
 		SLAVE_HEADER		;ws_Security + ws_ID
@@ -47,10 +60,19 @@ _expmem		dc.l	0		;ws_ExpMem
 		dc.w	_copy-base	;ws_copy
 		dc.w	_info-base	;ws_info
 
+	IFD BARFLY
+	DOSCMD	"WDate  >T:date"
+	ENDC
+
 _name		dc.b	"Stardust",0
 _copy		dc.b	"1993 Bloodhouse",0
-_info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal",10
-		dc.b	"V1.3 (09-Jan-2001)",0
+_info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal/Wepl",10
+		dc.b	"V1.4 "
+	IFD BARFLY
+		INCBIN	"T:date"
+	ENDC
+		dc.b	0
+	EVEN
 
 Start		lea	_resload,a1
 		move.l	a0,(a1)
@@ -839,5 +861,7 @@ BlitFix4	bsr	BlitWait
 _resload	dc.l	0
 _tags		dc.l	WHDLTAG_CUSTOM1_GET
 intro		dc.l    0
+		dc.l	0
 _savename	dc.b	'Highs',0
 password	dc.b	'Password',0
+
