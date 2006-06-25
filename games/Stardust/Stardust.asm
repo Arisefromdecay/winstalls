@@ -2,6 +2,7 @@
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
+;  :Id.		$Id$
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -23,6 +24,7 @@
 ;		25.06.2006 Wepl
 ;			termination of taglist for resload_Control fixed to
 ;			work with WHDLoad v16.6
+;			uses 'data' subdir
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -51,7 +53,7 @@ base
 		dc.l	$100000		;ws_BaseMemSize
 		dc.l	0		;ws_ExecInstall
 		dc.w	Start-base	;ws_GameLoader
-		dc.w	0		;ws_CurrentDir
+		dc.w	_dir-base	;ws_CurrentDir
 		dc.w	0		;ws_DontCache
 _keydebug	dc.b	0		;ws_keydebug = none
 _keyexit	dc.b	$59		;ws_keyexit
@@ -64,6 +66,7 @@ _expmem		dc.l	0		;ws_ExpMem
 	DOSCMD	"WDate  >T:date"
 	ENDC
 
+_dir		dc.b	"data",0
 _name		dc.b	"Stardust",0
 _copy		dc.b	"1993 Bloodhouse",0
 _info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal/Wepl",10
