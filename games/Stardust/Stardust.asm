@@ -2,7 +2,7 @@
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
-;  :Id.		$Id$
+;  :Id.		$Id: Stardust.asm 1.6 2006/06/25 10:35:52 wepl Exp wepl $
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -25,6 +25,8 @@
 ;			termination of taglist for resload_Control fixed to
 ;			work with WHDLoad v16.6
 ;			uses 'data' subdir
+;		03.05.2009 Wepl
+;			version checks for intro and main added
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -57,7 +59,7 @@ base
 		dc.w	0		;ws_DontCache
 _keydebug	dc.b	0		;ws_keydebug = none
 _keyexit	dc.b	$59		;ws_keyexit
-_expmem		dc.l	0		;ws_ExpMem
+_expmem		dc.l	$1000		;ws_ExpMem
 		dc.w	_name-base	;ws_name
 		dc.w	_copy-base	;ws_copy
 		dc.w	_info-base	;ws_info
@@ -70,53 +72,94 @@ _dir		dc.b	"data",0
 _name		dc.b	"Stardust",0
 _copy		dc.b	"1993 Bloodhouse",0
 _info		dc.b	"installed & fixed by Mr.Larmer/Bored Seal/Wepl",10
-		dc.b	"V1.4 "
+		dc.b	"V1.5 "
 	IFD BARFLY
 		INCBIN	"T:date"
 	ENDC
 		dc.b	0
+_savename	dc.b	'Highs',0
+_password	dc.b	'Password',0
 	EVEN
 
 Start		lea	_resload,a1
 		move.l	a0,(a1)
 		move.l	a0,a2
+
+	;	move.l	#CACRF_EnableI,d0
+	;	move.l	d0,d1
+	;	jsr	(resload_SetCACR,a2)
+
 		lea     (_tags,pc),a0
 		jsr     (resload_Control,a2)
 
-		lea	$7000,a0
-		move.l	a0,-(sp)
+		lea	$78000-$136,a3
+
+		move.l	a3,a0
 		moveq	#0,d0
 		move.l	#$1600,d1
 		moveq	#1,d2
 		jsr	resload_DiskLoad(a2)
-		move.l	(sp)+,a0
 
-		lea	intro,a6
-		tst.l	(a6)
-		beq	PatchBoot
-		move.b	#$60,$18e(a0)		;skip intro
+		move.l	a3,a0
+		move.l	#$1600,d0
+		jsr	(resload_CRC16,a2)
+		cmp.w	#$20ea,d0		;v1
+		beq	.ok
+		cmp.w	#$2d5,d0		;v2
+		bne	_wrongver
+.ok
+		move.l	_c1,d0
+		beq	.1
+		move.b	#$60,$18e(a3)		;skip intro
+.1
+		lea	_pl_boot,a0
+		move.l	a3,a1
+		jsr	(resload_Patch,a2)
 
-PatchBoot	move.w	#$4eb9,$22a(a0)
-		pea	PatchIntro
-		move.l	(sp)+,$22c(a0)
+		move.l	_expmem,a6
+		lea	($400,a6),a7
+		add.w	#$800,a6
+		move.l	a6,usp
+		move	#0,sr
 
-		move.w	#$4ef9,$29C(a0)
-		pea	PatchGame
-		move.l	(sp)+,$29E(a0)
+	;copy decruncher to fast memory
+		lea	($442,a3),a0
+		move.l	a6,a1
+		move.w	#($67e-$442+3)/4-1,d0
+.cp		move.l	(a0)+,(a1)+
+		dbf	d0,.cp
+		move.w	#$4ef9,($442,a3)
+		move.l	a6,($444,a3)
 
-		move.w	#$4ef9,$686(a0)
-		pea	Load
-		move.l	(sp)+,$688(a0)
+		jsr	(resload_FlushCache,a2)
 
-		move.w	#$602c,$158(a0)		;disk access
-		move.w	#$600c,$d2(a0)		;vbr+cacr operation
+		move.l	a3,d6			; loader address
+		move.l	#$80000,d7		; ext mem
+		jmp	($136,a3)
 
-		moveq	#0,d1			; attn flag
-		move.l	a0,d6			; loader address
-		move.l	#$7fc00,d7		; ext mem
-		jmp	$C4(a0)
+_pl_boot	PL_START
+		PL_S	$158,$2e		;disk access (to $186)
+		PL_PS	$22a,PatchIntro
+		PL_P	$29c,PatchGame
+		PL_P	$686,Load
+		PL_END
 
-PatchGame	move.l	$782E4,a5
+_wrongver	pea	TDREASON_WRONGVER
+		jmp	(resload_Abort,a2)
+
+		;a2/a3 must be preserved!
+_getcrc		move.l	$782E4,a5		(_41a)
+		move.l	#$1000,d0
+		move.l	a5,a0
+		move.l	_resload,a6
+		jmp	(resload_CRC16,a6)
+
+PatchGame	move.l	a1,-(a7)
+		bsr	_getcrc
+		cmp.w	#$e3f1,d0		;v1
+		bne	_wrongver
+		move.l	(a7)+,a1
+
 		move.w	#$F080,$4404(a5)	;remove access faults
 		move.w	#$F084,$1778(a5)
 		move.w	#$F084,$2e74(a5)
@@ -775,6 +818,10 @@ Back		movem.l	a0-a1,-(sp)
 
 Size		dc.l	0,0
 
+; .w disk number (0..2)
+; .3 offset (custom track is $1830, therefore +$230)
+; .3 length
+
 Load		movem.l	d0/d2-a6,-(sp)
 		moveq	#0,d2
 		move.w	(a1)+,d2
@@ -793,7 +840,7 @@ Load		movem.l	d0/d2-a6,-(sp)
 
 LoadPass	movem.l	d0-a6,-(sp)
 		bsr	Params
-		lea	password,a0
+		lea	_password,a0
 		move.l	a0,a5
 		jsr     (resload_GetFileSize,a2)
 		tst.l	d0
@@ -822,7 +869,7 @@ LoadSaveHighs	movem.l	d0-a6,-(sp)
 		lea	(a0),a1			;address
 		bsr	Params
 		jsr	(resload_SaveFile,a2)
-		lea	password,a0
+		lea	_password,a0
 		lea	$ece6c,a1
 		moveq	#12,d0
 		jsr	(resload_SaveFile,a2)
@@ -833,15 +880,34 @@ end		movem.l	(sp)+,d0-a6
 Params		lea	_savename,a0
 		move.l	_resload,a2
 		rts
-PatchIntro	lea	$80000,a4
-		move.l	#$4e714eb9,$275a(a4)
-		pea	BlitFix
-		move.l	(sp)+,$275e(a4)
 
-		move.w	#$4ef9,$277e(a4)
-		pea	BlitFix2
-		move.l	(sp)+,$2780(a4)
-		jmp	(a4)
+PatchIntro	move.l	a1,-(a7)
+
+		bsr	_getcrc
+		cmp.w	#$ac57,d0
+		bne	_wrongver
+
+		lea	_pl_intro,a0
+		move.l	a5,a1
+		jsr	(resload_Patch,a6)
+
+		clr.l	-(a7)
+		move.l	a5,-(a7)
+		pea	WHDLTAG_DBGADR_SET
+		move.l	a7,a0
+		jsr	(resload_Control,a6)
+		add.w	#12,a7
+
+		move.l	(a7)+,a1
+		jmp	(a5)
+
+_pl_intro	PL_START
+		PL_PS	$2752,.p1
+		PL_END
+
+.p1		move.w	#INTF_BLIT|INTF_INTEN|INTF_SETCLR,_custom+intena
+		addq.l	#2,(a7)
+		bra	BlitWait
 
 BlitFix		bsr	BlitWait
 		move.l	$86ef0,$dff054
@@ -861,10 +927,8 @@ BlitFix4	bsr	BlitWait
 		ori.w	#$fca,d1
 		rts
 
-_resload	dc.l	0
 _tags		dc.l	WHDLTAG_CUSTOM1_GET
-intro		dc.l    0
+_c1		dc.l    0
 		dc.l	0
-_savename	dc.b	'Highs',0
-password	dc.b	'Password',0
+_resload	dc.l	0
 
