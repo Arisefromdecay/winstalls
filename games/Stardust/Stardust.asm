@@ -2,7 +2,7 @@
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
-;  :Id.		$Id: Stardust.asm 1.6 2006/06/25 10:35:52 wepl Exp wepl $
+;  :Id.		$Id: Stardust.asm 1.7 2009/05/04 23:30:22 wepl Exp wepl $
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -89,8 +89,51 @@ Start		lea	_resload,a1
 	;	move.l	d0,d1
 	;	jsr	(resload_SetCACR,a2)
 
-		lea     (_tags,pc),a0
-		jsr     (resload_Control,a2)
+		lea	(_tags,pc),a0
+		jsr	(resload_Control,a2)
+
+		move.l	_expmem,a6
+		lea	($400,a6),a7
+		add.w	#$800,a6
+		move.l	a6,usp
+		move	#0,sr
+
+		move.l	a6,a0
+		move.l	#$136,d0
+		move.l	#$700,d1
+		moveq	#1,d2
+		jsr	(resload_DiskLoad,a2)
+
+		lea	$78000+$12d2,a0		;copper list
+		move.l	#$12d2,d0
+		move.l	#$1366-$12dc,d1
+		jsr	(resload_DiskLoad,a2)
+
+	;relocate the loader manually
+		lea	.relocs,a0
+		move.l	a6,d0
+		sub.l	#$78000,d0
+		bra	.relin
+.rel		sub.w	#$136,d1
+		add.l	d0,(a6,d1.w)
+.relin		move.w	(a0)+,d1
+		bne	.rel
+
+		lea	_pl_boot,a0
+		move.l	a6,a1
+		jsr	(resload_Patch,a2)
+
+		move.l	#$80000,d7		; ext mem
+		jmp	(a6)
+
+.relocs		dc.w	$14e,$154,$1c2,$1dc,$1e6,$308,$30e,$314,$31a,$320,$326,$3a6,$3ac,0
+
+_pl_boot	PL_START
+		PL_S	$158-$136,$2e		;disk access (to $186)
+		PL_PS	$22a-$136,PatchIntro
+		PL_P	$29c-$136,PatchGame
+		PL_P	$686-$136,Load
+		PL_END
 
 		lea	$78000-$136,a3
 
@@ -137,7 +180,7 @@ Start		lea	_resload,a1
 		move.l	#$80000,d7		; ext mem
 		jmp	($136,a3)
 
-_pl_boot	PL_START
+__pl_boot	PL_START
 		PL_S	$158,$2e		;disk access (to $186)
 		PL_PS	$22a,PatchIntro
 		PL_P	$29c,PatchGame
@@ -149,15 +192,16 @@ _wrongver	pea	TDREASON_WRONGVER
 
 		;a2/a3 must be preserved!
 _getcrc		move.l	$782E4,a5		(_41a)
+		lea	$80000,a5
 		move.l	#$1000,d0
 		move.l	a5,a0
 		move.l	_resload,a6
 		jmp	(resload_CRC16,a6)
 
 PatchGame	move.l	a1,-(a7)
-		bsr	_getcrc
+	;	bsr	_getcrc
 		cmp.w	#$e3f1,d0		;v1
-		bne	_wrongver
+	;	bne	_wrongver
 		move.l	(a7)+,a1
 
 		move.w	#$F080,$4404(a5)	;remove access faults
