@@ -2,7 +2,7 @@
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
-;  :Id.		$Id: Stardust.asm 1.7 2009/05/04 23:30:22 wepl Exp wepl $
+;  :Id.		$Id: Stardust.asm 1.8 2009/08/08 20:26:01 wepl Exp wepl $
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -27,6 +27,7 @@
 ;			uses 'data' subdir
 ;		03.05.2009 Wepl
 ;			version checks for intro and main added
+;			loader/stack relocated to fast mem
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -59,7 +60,7 @@ base
 		dc.w	0		;ws_DontCache
 _keydebug	dc.b	0		;ws_keydebug = none
 _keyexit	dc.b	$59		;ws_keyexit
-_expmem		dc.l	$1000		;ws_ExpMem
+_expmem		dc.l	$2000		;ws_ExpMem
 		dc.w	_name-base	;ws_name
 		dc.w	_copy-base	;ws_copy
 		dc.w	_info-base	;ws_info
@@ -100,7 +101,7 @@ Start		lea	_resload,a1
 
 		move.l	a6,a0
 		move.l	#$136,d0
-		move.l	#$700,d1
+		move.l	#$1370-$136,d1
 		moveq	#1,d2
 		jsr	(resload_DiskLoad,a2)
 
@@ -119,6 +120,12 @@ Start		lea	_resload,a1
 .relin		move.w	(a0)+,d1
 		bne	.rel
 
+	;skip intro
+		move.l	_c1,d0
+		beq	.1
+		move.b	#$60,($18e-$136,a6)
+.1
+	;patch
 		lea	_pl_boot,a0
 		move.l	a6,a1
 		jsr	(resload_Patch,a2)
@@ -126,84 +133,82 @@ Start		lea	_resload,a1
 		move.l	#$80000,d7		; ext mem
 		jmp	(a6)
 
-.relocs		dc.w	$14e,$154,$1c2,$1dc,$1e6,$308,$30e,$314,$31a,$320,$326,$3a6,$3ac,0
+.relocs		dc.w	$13c,$14e,$154,$1c2,$1dc,$1e6,$24e,$308,$30e,$314,$31a,$320,$326,$3a6,$3ac,0
 
 _pl_boot	PL_START
+		PL_PS	$144-$136,.ec
 		PL_S	$158-$136,$2e		;disk access (to $186)
+	;	PL_BELL	$226-$136,100
 		PL_PS	$22a-$136,PatchIntro
+		PL_PS	$256-$136,.ec
 		PL_P	$29c-$136,PatchGame
 		PL_P	$686-$136,Load
+		PL_W	$12d4-$136,$1200	;bplcon1
 		PL_END
 
-		lea	$78000-$136,a3
+.ec		move.l	(a7),a0
+		move.l	(-6-8,a0),a0
+		lea	$78000,a1
+		lea	_custom,a6
+		move.l	a1,(cop1lc,a6)
+.ec_cpy		move.l	(a0)+,(a1)+
+		bpl	.ec_cpy
+		tst.w	(copjmp1,a6)
+		move.w	#DMAF_SETCLR|DMAF_COPPER,(dmacon,a6)
+		addq.l	#2,(a7)
+		rts
 
-		move.l	a3,a0
-		moveq	#0,d0
-		move.l	#$1600,d1
-		moveq	#1,d2
-		jsr	resload_DiskLoad(a2)
+PatchIntro	movem.l	a0-a3,-(a7)
 
-		move.l	a3,a0
-		move.l	#$1600,d0
-		jsr	(resload_CRC16,a2)
-		cmp.w	#$20ea,d0		;v1
-		beq	.ok
-		cmp.w	#$2d5,d0		;v2
+		bsr	_getcrc
+		cmp.w	#$ac57,d0
 		bne	_wrongver
-.ok
-		move.l	_c1,d0
-		beq	.1
-		move.b	#$60,$18e(a3)		;skip intro
-.1
-		lea	_pl_boot,a0
-		move.l	a3,a1
-		jsr	(resload_Patch,a2)
 
-		move.l	_expmem,a6
-		lea	($400,a6),a7
-		add.w	#$800,a6
-		move.l	a6,usp
-		move	#0,sr
+		lea	_pl_intro,a0
+		move.l	a5,a1
+		jsr	(resload_Patch,a6)
 
-	;copy decruncher to fast memory
-		lea	($442,a3),a0
-		move.l	a6,a1
-		move.w	#($67e-$442+3)/4-1,d0
-.cp		move.l	(a0)+,(a1)+
-		dbf	d0,.cp
-		move.w	#$4ef9,($442,a3)
-		move.l	a6,($444,a3)
+		movem.l	(a7)+,_MOVEMREGS
+		jmp	(a5)
 
-		jsr	(resload_FlushCache,a2)
-
-		move.l	a3,d6			; loader address
-		move.l	#$80000,d7		; ext mem
-		jmp	($136,a3)
-
-__pl_boot	PL_START
-		PL_S	$158,$2e		;disk access (to $186)
-		PL_PS	$22a,PatchIntro
-		PL_P	$29c,PatchGame
-		PL_P	$686,Load
+_pl_intro	PL_START
+		PL_PS	$23ba,.b1
+		PL_PS	$2752,.p1
 		PL_END
 
-_wrongver	pea	TDREASON_WRONGVER
-		jmp	(resload_Abort,a2)
+.b1		bsr	_bw
+		move.l	#$9f00012,$dff040
+		addq.l	#4,(a7)
+		rts
 
-		;a2/a3 must be preserved!
-_getcrc		move.l	$782E4,a5		(_41a)
-		lea	$80000,a5
+.p1		move.w	#INTF_BLIT|INTF_INTEN|INTF_SETCLR,_custom+intena
+		addq.l	#2,(a7)
+_bw		BLITWAIT
+		rts
+
+_getcrc		lea	$80000,a5
+		clr.l	-(a7)
+		move.l	a5,-(a7)
+		pea	WHDLTAG_DBGADR_SET
+		move.l	a7,a0
+		move.l	_resload,a6
+		jsr	(resload_Control,a6)
+		add.w	#12,a7
 		move.l	#$1000,d0
 		move.l	a5,a0
-		move.l	_resload,a6
 		jmp	(resload_CRC16,a6)
 
-PatchGame	move.l	a1,-(a7)
-	;	bsr	_getcrc
-		cmp.w	#$e3f1,d0		;v1
-	;	bne	_wrongver
-		move.l	(a7)+,a1
+_wrongver	pea	TDREASON_WRONGVER
+		jmp	(resload_Abort,a6)
 
+PatchGame	bsr	_getcrc
+		lea	_pl_main_v1,a0
+		cmp.w	#$e3f1,d0		;v1
+		beq	.vok
+		lea	_pl_main_v2,a0
+		cmp.w	#$2e64,d0		;v2
+		bne	_wrongver
+.vok
 		move.w	#$F080,$4404(a5)	;remove access faults
 		move.w	#$F084,$1778(a5)
 		move.w	#$F084,$2e74(a5)
@@ -260,7 +265,7 @@ PatchGame	move.l	a1,-(a7)
 
 		move.w	#$4e75,$4016(a5)	;no cartridge check
 
-		move.l	a5,a0			;80000
+		move.l	a5,a1			;80000
 		lea	$f0000,a2
 		move.w	#$4a2e,d1
 		move.w	#$be02,d2
@@ -409,6 +414,12 @@ PatchGame	move.l	a1,-(a7)
 ;		move.w	#$4ef9,$9e(a5)		;enable outro
 ;		move.l	#$8011a,$a0(a5)
 		jmp	(a5)
+
+_pl_main_v1	PL_START
+		PL_END
+
+_pl_main_v2	PL_START
+		PL_END
 
 PatchSM		movem.l	a0-a4/d0-d5,-(sp)
 		move.w	#$96,$8f4
@@ -924,34 +935,6 @@ end		movem.l	(sp)+,d0-a6
 Params		lea	_savename,a0
 		move.l	_resload,a2
 		rts
-
-PatchIntro	move.l	a1,-(a7)
-
-		bsr	_getcrc
-		cmp.w	#$ac57,d0
-		bne	_wrongver
-
-		lea	_pl_intro,a0
-		move.l	a5,a1
-		jsr	(resload_Patch,a6)
-
-		clr.l	-(a7)
-		move.l	a5,-(a7)
-		pea	WHDLTAG_DBGADR_SET
-		move.l	a7,a0
-		jsr	(resload_Control,a6)
-		add.w	#12,a7
-
-		move.l	(a7)+,a1
-		jmp	(a5)
-
-_pl_intro	PL_START
-		PL_PS	$2752,.p1
-		PL_END
-
-.p1		move.w	#INTF_BLIT|INTF_INTEN|INTF_SETCLR,_custom+intena
-		addq.l	#2,(a7)
-		bra	BlitWait
 
 BlitFix		bsr	BlitWait
 		move.l	$86ef0,$dff054
