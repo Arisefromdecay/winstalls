@@ -2,7 +2,7 @@
 ;  :Program.	Stardust.asm
 ;  :Contents.	Slave for "Stardust" from Bloodhouse
 ;  :Author.	Mr.Larmer of Wanted Team, Bored Seal, Wepl
-;  :Id.		$Id: Stardust.asm 1.8 2009/08/08 20:26:01 wepl Exp wepl $
+;  :Id.		$Id: Stardust.asm 1.9 2009/08/09 21:46:18 wepl Exp wepl $
 ;  :History.	27.03.2000 - first release (Mr Larmer)
 ; (Bored Seal)  29.11.2000 - asteroids and menu access faults removed
 ;                          - highscore is saved to file now
@@ -208,7 +208,9 @@ PatchGame	bsr	_getcrc
 		lea	_pl_main_v2,a0
 		cmp.w	#$2e64,d0		;v2
 		bne	_wrongver
-.vok
+.vok		move.l	a5,a1
+		jsr	(resload_Patch,a6)
+
 		move.w	#$F080,$4404(a5)	;remove access faults
 		move.w	#$F084,$1778(a5)
 		move.w	#$F084,$2e74(a5)
@@ -243,10 +245,6 @@ PatchGame	bsr	_getcrc
 		move.w	d0,$1224(a5)
 		move.w	d0,$11b0(a5)
 		move.w	d0,$11e8(a5)
-
-		move.w	#$4EB9,$340(a5)
-		pea	Decrunch
-		move.l	(sp)+,$342(a5)
 
 		move.w	#$4ef9,d0
 		move.w	d0,$57C(a5)
@@ -416,6 +414,7 @@ PatchGame	bsr	_getcrc
 		jmp	(a5)
 
 _pl_main_v1	PL_START
+		PL_P	$340,Decrunch
 		PL_END
 
 _pl_main_v2	PL_START
@@ -825,27 +824,14 @@ skip4		cmp.l	a2,a0
 		ble	Hunt4
 		rts
 
-Decrunch	move.l	a2,-(sp)
-		lea	Size,a2
-		move.l	a1,(a2)+
-		move.l	6(a0),(a2)
-		moveq	#12,d1
-		subq.l	#4,sp
-		lea	(sp),a2
-.loop		move.l	4(a2),(a2)+
-		dbf	d1,.loop
-		move.l	(sp)+,a2
-		addq.l	#6,a0
-		move.l	(a0)+,d1
-		move.l	(a0)+,d2
-		pea	Back
-		move.l	(sp)+,$30(sp)
-		rts
+Decrunch	pea	($10,a0)	;start
+		move.l	(6,a0),-(a7)	;length
 
-Back		movem.l	a0-a1,-(sp)
-		lea	Size,a1
-		move.l	(a1)+,a0
-		move.l	(a1),a1
+		move.l	_expmem,a2
+		jsr	($800+$446-$136,a2)
+
+		move.l	(a7)+,a1	;length
+		move.l	(a7)+,a0	;start
 		add.l	a0,a1
 
 .loop		cmp.l	#$48E7E040,(a0)
@@ -862,16 +848,16 @@ Back		movem.l	a0-a1,-(sp)
 		bne.b	.next2
 		move.w	#$4EB9,(a0)
 		pea	Decrunch
+	illegal
 		move.l	(sp)+,2(a0)
 
 .next2		addq.l	#2,a0
 		cmp.l	a0,a1
 		bne.b	.loop
-		movem.l	(sp)+,a0-a1
-		tst.l	d0
-		rts
 
-Size		dc.l	0,0
+		movem.l	(a7)+,d2-d7/a0-a4	;original
+		moveq	#0,d0			;original
+		rts
 
 ; .w disk number (0..2)
 ; .3 offset (custom track is $1830, therefore +$230)
