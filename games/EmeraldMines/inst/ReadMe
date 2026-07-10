@@ -1,28 +1,43 @@
 That patch applies to the Emerald Mines CD (c) 1994 Kingsoft/Almathera.
 
-This install has the slave-version 1.0.
-It needs WHDLoad16 or higher in the path (eg in c:).
-For this install you need the Crystal Caverns 4 disk from the Emerald Web at 
-http://www.emeraldmines.net/default.asp?action=detail&p=downloads&id=54
-an ofcourse your Emerald Mines CD. Unpack the Crystal Caverns disk and
-insert the adf in a disk drive, and insert the CD into your CD drive.
-
-Note:    This install uses the engine from No One Inc. and thus allows
-           you to save your progress and highscores.
+It needs WHDLoad version 17 or higher in the path (eg in c:).
 
 Known Problem: On my UAE, it happens that the Amiga crashes when quitting
            the game. Please file a WHDLoad bug report when that happens
            to you too, so WEPL has some more examples for configurations
            of this bug.
 
-History: V1.0 - 2013-mar-02 Initial slave version.
+History:
+
+Version 2.0 - 2026-07-10 done by Wepl:
+- The game is now installed as it would run from CD. Crystal Caverns 4 is
+  no longer used. That means the game doesn't save highscores/progress
+  anymore (as it was when running from CD). The game executable no longer
+  contains code for saving. So saving is only possible when using a
+  different EM executable. If you want saving just use a new game engine
+  from Emerald Web (http://www.emeraldmines.net/) and copy the level data
+  you want to use. I think most levels from the CD are also available on
+  Emerald Web.
+- The game must be reinstalled of course!
+- Because of the many files it is recommended to use an archived data
+  directory (zip will be faster than lha) and use option PreloadSmart.
+- Dedication can be skipped.
+- source available: https://github.com/wepl/winstalls
+
+Version 1.0 - 2013-mar-02 Initial slave version.
+For this install you need the Crystal Caverns 4 disk from the Emerald Web at
+http://www.emeraldmines.net/default.asp?action=detail&p=downloads&id=54
+and of course your Emerald Mines CD. Unpack the Crystal Caverns disk and
+insert the adf in a disk drive, and insert the CD into your CD drive.
+Note: This install uses the engine from No One Inc. and thus allows
+you to save your progress and highscores.
 
 The install is tested on an 18 MB 68030 and on E-UAE.
 It needs 1000 kB Chipmem, 256 kB arbitrary memory and additionally 800 kB
   for preload. It also needs about 100 MB on your hard disk and a lot of
   time to install!
 
-Disclaimer: Install is Freeware and sourcecode is included. 
+Disclaimer: Install is Freeware and sourcecode is included.
         You use the install wholly on your own risk.
 
 Full whdload package:	aminet:dev/misc/whdload#?.lha

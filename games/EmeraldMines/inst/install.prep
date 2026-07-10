@@ -1,0 +1,46 @@
+#version=4
+#sub-dir=data
+#P_MakeImages#4
+      (message ("\nInsert your %s CD in any drive." @app-name))
+      (set #AD_disk "EM")
+      (set #dir (tackon #dest "C"))
+      (makedir (#dir) (help @makedir-help))
+      (copyfiles
+        (help @copyfiles-help)
+        (source ("%s:C" #AD_disk))
+        (dest #dir)
+        (pattern "(Assign|Copy|Execute)")
+      )
+      (set #dir (tackon #dest "S"))
+      (makedir (#dir) (help @makedir-help))
+      (textfile
+        (dest (tackon #dir "Startup-Sequence"))
+	(append
+	  ("assign T: RAM:\nassign em: :\n_base/Dedication\n_base/Intro >T:EM\nExecute T:EM")
+	)
+      )
+      (set #dir (tackon #dest "_Base"))
+      (makedir (#dir) (help @makedir-help))
+      (copyfiles
+        (help @copyfiles-help)
+        (source ("%s:_Base" #AD_disk))
+        (dest #dir)
+        (pattern "(Dedication|EM|fol|Intro|map|nam|pic|spr|tab)")
+      )
+      (copyfiles
+        (help @copyfiles-help)
+        (source ("%s:" #AD_disk))
+        (dest #dest)
+        (pattern "(_GFX|_SFX)")
+      )
+      (run ("Delete \"%s/_GFX/#?/ilbm#?\" \"%s/_GFX/all.script\"" #dest #dest))
+      (working "Copying levels...")
+      (set #dir (tackon #dest "_LEV"))
+      (makedir (#dir) (help @makedir-help))
+      (copyfiles
+        (help @copyfiles-help)
+        (source ("%s:_LEV" #AD_disk))
+        (dest #dir)
+        (pattern "~(#?.checked)")
+        (nogauge)
+      )
