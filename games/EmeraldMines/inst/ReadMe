@@ -4,7 +4,7 @@ It needs WHDLoad version 17 or higher in the path (eg in c:).
 
 Known Problem: On my UAE, it happens that the Amiga crashes when quitting
            the game. Please file a WHDLoad bug report when that happens
-           to you too, so WEPL has some more examples for configurations
+           to you too, so Wepl has some more examples for configurations
            of this bug.
 
 History:
@@ -33,8 +33,8 @@ Note: This install uses the engine from No One Inc. and thus allows
 you to save your progress and highscores.
 
 The install is tested on an 18 MB 68030 and on E-UAE.
-It needs 1000 kB Chipmem, 256 kB arbitrary memory and additionally 800 kB
-  for preload. It also needs about 100 MB on your hard disk and a lot of
+It needs 2 MB Chipmem, 512 KB arbitrary memory and additionally some MB
+  for preload. It also needs about 45 MB on your hard disk and a lot of
   time to install!
 
 Disclaimer: Install is Freeware and sourcecode is included.
