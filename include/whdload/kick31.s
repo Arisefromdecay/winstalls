@@ -53,6 +53,7 @@
 ;		13.11.21 INIT_RESOURCE added
 ;		14.11.21 WHDCTRL added
 ;		01.11.25 support for ws_MemConfig added
+;		11.07.26 WHDCTRL patch added for A600/A4000 kickstart too
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -323,6 +324,9 @@ kick_patch600	PL_START
 	IFD SEGTRACKER
 		PL_PS	$230cc,segtracker_init
 	ENDC
+	IFD WHDCTRL
+		PL_PS	$230f8,dos_whdctrl
+	ENDC
 	IFD BOOTDOS
 		PL_PS	$23100,dos_bootdos
 	ENDC
@@ -551,6 +555,9 @@ kick_patch4000	PL_START
 	ENDC
 	IFD SEGTRACKER
 		PL_PS	$18c08,segtracker_init
+	ENDC
+	IFD WHDCTRL
+		PL_PS	$18c34,dos_whdctrl
 	ENDC
 	IFD BOOTDOS
 		PL_PS	$18C3C,dos_bootdos
