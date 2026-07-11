@@ -44,3 +44,4 @@
         (pattern "~(#?.checked)")
         (nogauge)
       )
+      (run ("Delete \"%s/_LEV/#?/.fastdir\" \"%s/_LEV/EmeraldMine_20/hextest.info\" \"%s/_LEV/HauntedMine_03/obj\"" #dest #dest #dest))
