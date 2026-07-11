@@ -2,14 +2,13 @@
 Generic WHDLoad KickEmu Starter by JOTD, Wepl
 
 Can be used to run programs/demos/games using WHDLoad's kickstart
-emulation. This may work with some programs if they are compatible 
-enough.
+emulation. This may work with some programs if they are compatible enough.
 
 Usage:
 
 Copy the stuff you like to start into the data directory.
-Use option Custom to specify which executable with possible arguments 
-should be started.
+Use the option Custom to specify which executable should be started and which
+arguments should be passed to it.
 
 Example:
 
@@ -21,10 +20,10 @@ SLAVE=GenericKick13.slave
 PRELOAD
 CUSTOM=madnessII
 
-With the archive and the explanation, all persons who want to test can do
-that now. Maybe the generickick will be expanded, as the source are on the
-archive. So you may also assemble other Slaves with different memory settings.
- 
+The sources are available at https://github.com/wepl/winstalls, so GenericKick
+may be extended and you may also assemble other Slaves with different memory
+settings.
+
 
 History:
 
@@ -33,12 +32,13 @@ History:
 
 1.1 (01.11.2007) by Wepl
 - adapted for new kickemu and WHDLoad v16+
-- keyboard fix in 1.3 removed because already in kickemu now
+- keyboard fix in the Kickstart 1.3 slave removed because it is already in
+  kickemu now
 
 1.2 (24.04.2016) by Wepl
 - better error handling
 - caches disabled
-- memory set to 1MB/2MB chip only for better compatibility
+- memory set to 1 MB/2 MB chip only for better compatibility
 - reassembled with latest kickemu
 
 1.3 (15.11.2021) by Wepl
@@ -53,5 +53,9 @@ History:
 
 1.6 (09.12.2025) by Wepl
 - assembled with latest kickemu sources
-- source available: https://github.com/wepl/winstalls
+- sources available: https://github.com/wepl/winstalls
+
+1.7 (11.07.2026) by Wepl
+- fixed WHDCtrl which was only working with the A1200 kickstart, it is now
+  available with the A600 and A4000 kickstart too
 

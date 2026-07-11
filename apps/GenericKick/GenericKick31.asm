@@ -9,6 +9,7 @@
 ;		01.11.07 reworked for v16+ (Wepl)
 ;		24.04.16 version bump
 ;		15.11.21 updated for new kickemu
+;		11.07.26 WHDCtrl now also works with A600/A4000 kickstart
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -90,7 +91,7 @@ slv_CurrentDir	dc.b	"data",0
 slv_name	dc.b	"Generic KickStarter 40.068",0
 slv_copy	dc.b	"1985-93 Commodore-Amiga Inc.",0
 slv_info	dc.b	"by JOTD, Wepl",10
-		dc.b	"Version 1.6 "
+		dc.b	"Version 1.7 "
 		INCBIN	".date"
 		dc.b	0
 	EVEN
