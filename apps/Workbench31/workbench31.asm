@@ -18,6 +18,7 @@
 ;		28.09.22 ignore unset names in _cb_dosLoadSeg
 ;		24.11.24 git repo integration
 ;		02.11.25 switch to MemConfig
+;		11.07.26 WHDCtrl now also works with A600/A4000 kickstart
 ;  :Requires.	kick31.s kickfs.s segtracker.s
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -100,7 +101,7 @@ slv_CurrentDir	dc.b	"data",0
 slv_name	dc.b	"Workbench 3.1 Kickstart 40.063/068",0
 slv_copy	dc.b	"1985-93 Commodore-Amiga Inc.",0
 slv_info	dc.b	"adapted for WHDLoad by Wepl",10
-		dc.b	"Version 1.13 "
+		dc.b	"Version 1.14 "
 		INCBIN	".date"
 		dc.b	0
 	IFGE slv_Version-17

@@ -17,13 +17,13 @@
  The installed program requires 1..2 MB ChipMem and 2..33 MB OtherMem.
  It can be quit by pressing F10 (key can be changed with Tooltype "QuitKey=").
 
- The game requires an installed A600/A1200/A4000 Kickstart 3.1 image.
+ The program requires an installed A600/A1200/A4000 Kickstart 3.1 image.
  The kickstart image must be located in the directory "Devs:Kickstarts" and
  must be named "kick40063.A600", "kick40068.A1200" or "kick40068.A4000". The
- image can be extracted from a A600/A1200/A4000 with tools like 'GrabKick' or
+ image can be extracted from an A600/A1200/A4000 with tools like 'GrabKick' or
  similar which can be found on aminet.
- If the image is of wrong version or altered in any way WHDLoad will quit with
- an appropriate message.
+ If the image is of the wrong version or altered in any way WHDLoad will quit
+ with an appropriate message.
  Additionally the file "kick40063.A600.RTB", "kick40068.A1200.RTB" or
  "kick40068.A4000.RTB" must be installed in the same directory as the kickstart
  image. It can be found in the archive "util/boot/skick346.lha" on aminet.
@@ -32,12 +32,12 @@
  ---------
  This installs the Workbench under WHDLoad. You may add other software manually
  by copying it to the installation directory.
- It is tested with original 6 disk DD Floppy release. It should also work with
- the 3 disk HD floppy release, but this is untested.
- To speedup the preload process you may delete all unwanted files, e.g. other
+ It has been tested with the original 6 disk DD floppy release. It should also
+ work with the 3 disk HD floppy release, but this is untested.
+ To speed up the preload process you may delete all unwanted files, e.g. other
  languages, fonts etc.
- It is recommend to use option PreloadSmart instead Preload to preload only
- previously used files.
+ It is recommended to use option PreloadSmart instead of Preload to preload
+ only previously used files.
  Using option MemConfig you can use different memory configurations:
    default: 	1 MB Chip + 1 MB Fast
    MemConfig=1:	2 MB Chip + 4 MB Fast
@@ -48,8 +48,12 @@
 
  History:
  --------
+ version 1.14 (2026-07-11) done by Wepl:
+ - fixed the internal resident command WHDCtrl which was only working with the
+   A1200 kickstart, it is now available with the A600 and A4000 kickstart too
+
  version 1.13 (2025-12-18) done by Wepl:
- - clear fl_Task before freeing lock structure during UnLock
+ - clear fl_Task before freeing lock structure during UnLock,
    this fixes the games Bograts and Valhalla3FortressOfEve (rb)
 
  version 1.12 (2025-12-08) done by Wepl:
@@ -57,20 +61,22 @@
 
  version 1.11 (2025-11-23) done by Wepl:
  - requires WHDLoad version 20
- - offer different memory configurations
- - Slaves for different memory configs are replaced by a single Slave
+ - offers different memory configurations
+ - the separate Slaves for different memory configs have been replaced by a
+   single Slave
 
  version 1.9 (2024-06-10) done by Wepl:
  - recompiled with latest sources
 
  version 1.8 (2022-01-02) done by Wepl:
  - fixed crash with _cb_dosLoadSeg and empty names
- - fixed a bug bug in kickfs with write cache
- thanks to Radek for reports 
+ - fixed a bug in kickfs with write cache
+ thanks to Radek for the reports
 
  version 1.7 (2021-11-15) done by Wepl:
  - reassembled with latest kickemu
- - activated internal resident command WHDCtrl which can quit WHDLoad ATM
+ - activated the internal resident command WHDCtrl which can currently be used
+   to quit WHDLoad
 
  version 1.6 (2021-01-03) done by Wepl:
  - reassembled with latest kickemu
@@ -79,28 +85,30 @@
  version 1.5 (2019-01-19) done by Wepl:
  - reassembled with latest kickemu, SegTracker added
 
- version 1.4 (05.10.17) done by Wepl:
- - adapted for latest kickemu, with that also the cache setup has changed:
-   before it was inst/data cacheable in expansion memory, without MMU non
-   cacheable, now it is inst cachable in all memory, also without MMU
-   use option NoCache if this breaks compatibility with extra software
-   installed
+ version 1.4 (2017-10-05) done by Wepl:
+ - adapted for latest kickemu, which also changed the cache setup:
+   before it was inst/data cacheable in expansion memory and non-cacheable
+   without MMU, now it is inst cacheable in all memory, also without MMU.
+   Use option NoCache if this breaks compatibility with extra installed
+   software
  - updated install script
 
- version 1.2 (09.04.10) done by Wepl:
- - providing additional slaves with more memory
- - slaves reassembled with latest kickemu version
+ version 1.2 (2010-04-09) done by Wepl:
+ - provides additional Slaves with more memory
+ - Slaves reassembled with latest kickemu version
 
- version 1.1.1 (17.02.07) done by Wepl:
- - install script corrected to place files from Storage disk into own folder
+ version 1.1.1 (2007-02-17) done by Wepl:
+ - install script corrected to place files from the Storage disk into its own
+   folder
 
- version 1.1 (21.01.07) done by Wepl:
- - supports A600 kickstart due updated kickemu, with that 68000 compatible
+ version 1.1 (2007-01-21) done by Wepl:
+ - supports the A600 kickstart due to the updated kickemu, which makes it
+   68000 compatible
  - new install script
  - greetings to Don Adan
 
- version 1.0 (18.12.06) done by Wepl:
- - initial release on eab
+ version 1.0 (2006-12-18) done by Wepl:
+ - initial release on EAB
 
  Contact:
  --------
