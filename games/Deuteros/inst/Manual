@@ -1,0 +1,713 @@
+                   __                                                    
+    The __________/ /\___       __________        __________   _______   
+       / ________/ /__  /\     / ________ \      / ______  /\ / _____/\  
+      / /\______/ /__/ / /    / /_______/\ \    / /\____/ / // /\____\/  
+     /____  /\ / / // / /    / ___/\   / /\ \  / / /   / / //____  /\    
+    _\___/ / // / // /_/____/ /___\/  / / /\ \/ / /   / / /_\___/ / /    
+   /______/ //_/ //________/ ______/\/_/ /  \__/ /   /_/ //______/ /     
+   \______\/ \_\/ \_______/_/\_____\/\_\/    \_\/    \_\/ \______\/ -OEP 
+                          \_\/  
+           PRESENT TO YOU: DEUTEROS COMPLETE DOCS AND SOLVE 
+                  CREATED AND TYPED BY SYCON & HIS BRO   
+
+
+Introduction - 
+
+These Docs Consist of the Description of All the ICONS which explain how 
+to play the game, and a SOLVE...since everything in this game happens in 
+a order according to the players action it is almost impossible to write
+a 100% step by step solve. Sorry if you find errors in the docs or 
+something that I forgot to include but I was too lazy to go over the docs
+to see if I missed something. Also sorry about the time it took me to write
+these docs but that is how it is when YOU MAKE THE DOCS yourself as you play.
+Well last thing thanks to Skid Row for cracking This Awesome game.
+
+
+
+Control Panel Icons
+-------------------
+At the top left hand corner of the screen you have a bunch of icons.
+Some of these icons you will not have at the beginning but they will 
+appear as you advance in the game. Here is what they are and what they do.
+
+ 
+Time Advance   -    click on this and it will advance time until you press 
+                    the mouse button again. You can also advance time by
+                    clicking on the bar at the bottom of the screen that
+                    tells the year, # of days, and the stardate.
+
+Master Control   -    shows you all the orbital factories, interplanetary
+                      spacecrafts, and starships that you have in that 
+                      system. You can access any of the above just by 
+                      pressing  on them.
+
+Stocktaker   -    clicking on this will show you a list of all the minerals
+                  and all the orbital factories that you have. Pick any 
+                  mineral and it will show what orbital factory has it and 
+                  how many tons it has. There are also two icons at the 
+                  bottom, one is Switch Storerooms and the other Team Roster
+                  On/Off.
+        
+  Switch Storerooms   -    shows your orbital factories and a bar at the
+                           right hand side with red buttons. Each red button
+                           indicates an item. Clicking on a red button will
+                           show you a picture of the item you selected, its
+                           name, and what orbital factory has it and in what
+                           quantities. Click on the switch storerooms and 
+                           then click on the Team Roster On/Off icon.
+
+  Team Roster On/Off   -    shows you all the teams you have (Pilots,
+                            Researchers, Producers), how many people in each
+                            one, their location, and their rank. At the
+                            bottom there are two arrows (previous page and 
+                            next page) which are used when you have more 
+                            teams than can fit on the screen.
+     
+              Rank     Name        # of People     Location
+             ------   ------      -------------   ----------               
+              PRF     RICHIE            250          EARTH
+      
+                                                                              
+Deposit Analysis   -    shows you all the planets that are in the system.
+                        Clicking on a planet will show you all the minerals
+                        it has and all the moons that are around it, if any.
+                        Now you can click on a moon and see what minerals
+                        it has. If you have an orbital factory around that
+                        planet it will show you a picture of it at the 
+                        bottom. Click on the planet again to zoom out. At
+                        the top the screen it tells you the system you are in
+                        and the planet you selected. Later in the game you 
+                        can click on the sun which will zoom out even more
+                        and show you all the other systems. Click on a system
+                        and it zooms in showing you all the planets that are
+                        in that system.
+
+Disk Access   -   at the top of the screen there is a timer showing how long
+                   you are playing and the last time that you saved your 
+                   game. There are also some icons in the middle of the
+                   screen and they are:
+
+  Disk Directory - clicking on it will show you all the saved games that you
+                   have on a disk.
+
+  Format Disk - format disk.
+ 
+  L.E.D. Toggle - turns led on/off.
+
+  Run Demo! - suppose to run a demo of the game but it does work, at least
+              not on my amiga.
+ 
+  Save And Load Game - clicking on the green arrow next to the disk will load
+                       a game and the red arrow will save a game. Clicking
+                       on a game will allow you to name it. You should use
+                       at least two save disks in case one gets messed up.
+ 
+  Shuttle And IOS Threshold - tells the auto cargo computer (will get later 
+                              in the game) when to refuel. Clicking on the +
+                              and - signs you can set at how many tons of
+                              fuel the computer should refuel at.
+
+News Bulletins - tells you the news reports (almost useless) except maybe for
+                 the little screen at the bottom (Repeat Last Bulletin) which
+                 shows you the last message that the scientists left you in
+                 case you forgot what they said.
+
+Earth City   -    takes you back to Earth city (I will explain all the icons
+                  there later).
+
+Star Selector - (Later in the game) Shows you the different systems. Clicking
+                on a system will take you there showing you all the
+                factories, IOSs, and starships (just like the Master control
+                except that this is for other systems) that you have there,
+                if any.
+
+
+Various Locations 
+-----------------
+These are the locations on Earth and also on Orbital Factories. You will
+not have some of these at the beginning but they will appear as you advance 
+in the game.
+
+Production - lets you produce any of the things that your scientists
+             developed. Ok, at the right side you have a bar (same one as in
+             the Stocktaker) that shows you all the things that you can
+             produce (the list will increase as your scientists develop
+             more items). Green buttons indicate items that you can produce,
+             red buttons indicate items that you can't produce due to the
+             leaders low rank, yellow buttons indicate items that can only
+             be produced in orbit. Moving the mouse over the buttons will
+             show you a picture of the item in the book and its name at the
+             top of the screen. Clicking on an item with a green button will
+             start producing it unless there is not enough resources to 
+             produce it. Then it will tell you what resources you are missing
+             or have too little of. At the bottom of the screen it shows you
+             the leaders name, his rank, and the number of staff (maximum of
+             200). There is also an icon next to this whick allows you to 
+             send the leader and his staff to bay where you can transport
+             him to a different factory.
+
+Shuttle - clicking on this will put you inside a shuttle (if you have any).
+          Also you cannot set a course for a shuttle it can only travel
+          between an orbital factory and the surface of a planet. Here you
+          have the following icons that a shuttle has:
+
+  Service Ship - puts you outside the shuttle so that you can service it 
+                 (the craft must be in a bay to be able to service it). I 
+                 will describe it under the Shuttle Bay Icon.
+
+  Supply Computer - (Later in the game) Clicking on this allows you to 
+                    program the computer so that it will keep transporting
+                    different minerals by itself. Here you will see a list
+                    of all the minerals and dots on the left and right of
+                    mineral. It also shows you all the way on the left and 
+                    right side the two locations between which the shuttle
+                    is transporting the minerals. Ok, the left hand side
+                    location and its arrow is allways shown in green and the
+                    right hand side location and its arrow is shown in brown.
+                    If you want to transport a mineral from the left hand 
+                    side location to the right hand side location you click
+                    on the left side of the mineral and a green dot should
+                    appear. Then click on the Engage A.C.C. icon at the 
+                    bottom and the computer will start transporting it. If
+                    you want to transport a mineral from the right side 
+                    location to the left you do the opposite. You click on
+                    the right side of the mineral and a brown dot should 
+                    appear. Then Engage the computer and it will start 
+                    transporting the mineral. At the bottom there are four
+                    icons:
+
+     Engage A.C.C. - engages the auto cargo computer.
+
+     Disengage A.C.C - disengages the auto cargo computer.
+
+     Complete Cycle - if you have the computer transporting three minerals
+                      and it is only on the first one and you want to
+                      disengage it but you want it to transport all three
+                      minerals first then you click on this icon so that the
+                      computer will transport all three resources and then 
+                      stop.
+ 
+     Clear Setting - clears all that you selected.
+
+  Dock - click on this and the shuttle will dock after advancing a day.
+
+  Land - land
+
+  Launch - launch
+
+  Pod Mounts - shows you what pod you have and what is in it. If you have
+               a part of an orbital factory in a pod then clicking on it 
+               will activate it.  
+
+  Switch Views - switches views between an information screen which tells 
+                 you what the shuttle is carrying, how much fuel it has,
+                 its location, its pilot, etc. and a picture showing where
+                 you are located.
+
+Training - here you have three doors for recruiting different teams. One is
+           researchers, one for producers, and one for marines (pilots).
+           On the left side in a bar in shows you how many people you have
+           for recruiting (you start with 6000). In each door there are two
+           arrows (return to pool and recruit). Click on the recruit arrow
+           for researchers until it reaches its maximum (100). Then pass 
+           days and the door will close. Wait until it opens which means 100
+           researshers have been recruited. Then click on the arrow again and
+           recruit another 100 (you can have 250 researchers as one team,
+           200 producers as one team, and 41 marines as one team). When you
+           recruit researchers they are automatically transfered to Research,
+           producers are transfered to Production, and marines are transfered
+           to Shuttle Bay.    
+       
+        Team      Ranks      Team       Ranks       Team         Ranks
+      -------   --------   ---------   --------    -----------   --------
+      Marines -  Pilot     Producers - Technician  Researchers - Apprentice 
+              -  Captain             - Doctor                  - Engineer
+              -  Admiral             - Professor               - Expert
+              -  Warlord             
+
+
+
+Research - this is where the scientists research all the cool stuff. On the
+           right side you have buttons that show all the things that you can 
+           research. Green buttons indicate items that have already been
+           researched, red buttons indicate items that were not researched,
+           and yellow buttons indicate items that are in the middle of
+           being researched (started but not finished). Click on an item
+           and the scientists will start researching it. At the top it tells
+           you the name of the item, the tech level, and how many percent 
+           your scientists have researched. Once the item is researched it
+           tells you its mass and what minerals you need to build it. It
+           also tells you where the item may be produced (in orbit or on
+           Earth). At the bottom of the screen you have the leaders name,
+           his rank, and number of staff. Some of the items, later in the 
+           game, you will not be able to research until your leader advances 
+           in his rank. 
+
+Shuttle Bay - here you make new shuttles, equip them, assign their crew, and
+              refuel them. At the top you have a New Shuttle icon. Click on
+              it and it will raise a new shuttle if you have build one. Now
+              at the top you have a dismantle icon which will lower the 
+              shuttle but it will not destroy it. There is also a kind of a 
+              map showing all the section of the shuttle (the crew section,
+              pod mounting, and engine mounting). Just click on any section
+              and the big shuttle in the middle will move to that section.
+              Here is a descrition of all the sections.
+
+  Crew Section - here you can see the front of the shuttle and 4 vacant spots
+                 to the left of it. You should first train 41 Marines and
+                 they will appear on the first vacant spot. Click on the 
+                 Marines (assign crew) and they will show up under the 
+                 shuttle. If you want to remove the pilot just click on one
+                 of the vacant spots (remove ship's crew). After assigning
+                 a crew there is a bar at the bottom with MeH written next
+                 to it. Click on the + sign (fuel ship) until it reaches
+                 250 tons (max. amount of fuel). If you have no fuel you must
+                 first research Hydrogen Methanol Fuel (MeH fuel). Once you
+                 have it researched your mining rigs will start producing
+                 it. Later in the game when your scientists develop an Auto
+                 Cargo Computer an icon with ACC written on it will appear
+                 next to the shuttle. This icon is used to install the A.C.C.
+                 unto the shuttle. You can also access the shuttle just by
+                 clicking on it which will put you inside.             
+ 
+  Pod Mount - in this section of the shuttle you can install three different
+              pods to transport anything you want between a planet and an
+              orbital factory. Under the shuttle you have three icon
+              representing the three pods (supply pod, tool pod, and 
+              team pod). 
+                
+    Install Supply Pod - supply pods are used to carry minerals only and 
+                         have a maximum capacity of 250 tons. Once you have 
+                         a supply pod installed click on it and pick the 
+                         mineral you want to take (you can only carry 250 
+                         tons or less of only one mineral per pod). Click
+                         the right mouse button to exit the menu and under 
+                         the pod you will see the name of the mineral you 
+                         picked and how many tons are in there.                         
+
+    Install Tool Pod - tool pods are used to carry items and equipment such
+                       as derricks and orbital factory sections. Once you
+                       have it installed click on it and a menu of all the 
+                       equipment you can take will appear (the list will get
+                       bigger as your scientists develop more items). Pick
+                       an item and click the right mouse button to exit. Like
+                       in the supply pod the name of the item that you picked
+                       will appear under the pod.
+
+    Install Team Pod - team pods are used to carry either producers or
+                       marines to other stations. Once you have the pod 
+                       installed click on it and four vacant spots will 
+                       appear. If you have someone in shuttle bay they will
+                       appear on the first vacant spot. Click on them and
+                       they will be transfered to the team pod. Only one 
+                       team can be carried in a pod. Press the right mouse
+                       button to exit. Below the pod you can see the name
+                       and occupation of the dudes that are inside.                      
+    
+    Engine Mounting -  the only thing here that you can do is install the
+                       engine into the craft. There is an icon at the bottom
+                       called install drive unit, just press it and the 
+                       engine will be installed.
+
+Resource - here it tells you what resources the planet has. At the bottom 
+           right corner there is an icon called Add Mining Rig. When you
+           finish building a few derricks you should go here and add rigs
+           so that they will start mining. You can have a maximum of 8 rigs
+           mining on each planet. Each derrick produces 1 ton of each
+           mineral per day but in some cases it may produce more.
+
+Minig Store - here there is a list of all the minerals and how many tons of
+              each you have in stores on that perticular planet or orbital 
+              factory. To the left there is a bunch of buttons just like
+              in Production and Stocktaker, each one representing a tool
+              or some equipment. Click on the first button (Resource Mining
+              Rig) and it will tell you how many you can build with the
+              available resources. If there is not enough tons of a 
+              particular mineral then the mineral will be highlighted in red.
+              At the bottom of the screen there is Switch Storeroom icon. 
+
+  Switch Storeroom - clicking on this will cause a list of all the tools
+                     and equipment that you have researched and can build to 
+                     appear and also telling you how many of each you have in
+                     stores. Click on any tool and an information box will
+                     appear showing a picture of it and a brief description
+                     of what it is and what it does. Here is the list and
+                     description of all the tools that are in the game. 
+                     Remember that most of these tools you will not have at 
+                     the beginning of the game but would probably want to.
+                         
+    Resource Mining Rig - (Derrick) fully automated ore recovery and refining
+                          unit. Can adapt to all known elements and is semi-
+                          portable to allow location on any mining site.
+
+    Shuttle Chasis - (S Chasis) surface to orbit workhorse. Pod mounting
+                     allows maximum of 250 ton payload.
+
+    Shuttle Drive Unit - (S Drive) short burst drive which requires Hydrogen
+                         Methanol Fuel (MeH).
+
+    Orbital Factory Section - (Of Frame) partial framework for construction 
+                              of orbital factories. Computer control handles
+                              positioning sequence to ensure correct locking
+                              of the 8 sections. There still must be a pilot
+                              on board to be able to install he sections.
+
+    Tool & Equip. Mounting - (Tool Pod) for haulage and mounting of tool or
+                             equipment. Mounting is linked to ship's cockpit
+                             allowing the crew to control any item carried.
+                             
+    Supply Pod - for all material haulage. Standard fitted for use on a 
+                 shuttle. Unit has a single cavity so may only hold one type
+                 of material. If you want to dump the cargo while in flight
+                 just go inside the ship and click on the pod then click on
+                 Ditch Contents.
+
+    Cryo Pod - for haulage of teams such as pilots or producers. Personnel
+               are held in stasis while inside the pod. This also protects
+               its occupants from disease and aging.
+
+    I.O.S. Chasis - (I Chasis) interplanetary operations spacecraft. Three
+                    pod mountings allow maximum of 750 ton payload. The
+                    I.O.S. is the same as the shuttle except that it has
+                    3 pod mountings and can travel to other planets. You can
+                    also fit the A.C.C. to it to make transporting minerals
+                    easier. When you are inside the I.O.S. there is an icon
+                    at the bottom called Set Course that the shuttle does not
+                    have. Click on it an a system chart will appear. Click
+                    on a planet just like in Deposit Analysis and the course
+                    is set.
+
+    I.O.S. Drive Unit - (I Drive) long duration drive unit. Requires Hydrogen
+                        Methanol Fuel.
+
+    Auto Cargo Computer - (A.C.C) Fit and Forget! Allows programming of 
+                          shuttle and IOS for automated stock haulage.
+                          Settings available for balancing stocks between
+                          destinations. Cockpit mounted.
+
+    Hydralic Grapple - (Grapple) for retrieving small objects of up to 250T.
+                       Must be pod mounted.
+
+    Auto Operations Computer - (A.O.C.) automates production processes, so
+                               there is no need for Artisans. May be 
+                               programmed for on/off or repeating production.
+                               To produce something only once click on the 
+                               button until it becomes yellow. If you want
+                               it to keep producing it more than once just
+                               click on the button until it becomes green.
+
+    Installation Repair Equip. - (Bandaid) for the repair of abondoned or
+                                 derelict surface ststions. Shuttle bay must
+                                 still be operative! Must be pod mounted.
+
+    Asteroid Mining Attachment - (A.M.A.) for surface mining of large
+                                 asteroids . Process requires access to an 
+                                 empty supply pod. May be A.C.C. controlled.
+                                 The asteroid must have a mass greater than
+                                 10,000 tons.
+
+    Resource Station Section - (R Frame) parial framework for construction of
+                               surface stations. Computer control handles
+                               positioning sequence to ensure correct locking
+                               of the 2 sections.
+
+    Communication Adaptor - (Comms Pod) Methanoid origin. Translates verbal
+                            communication into HUD text. Technical Analysis
+                            also reveals holographic image processing.
+
+    IOS Battle Drone - (IOS Drone) special chasis incorporating one fusion 
+                       laser. Flight controlled via flagship drone computer.
+
+    Drone Fleet Control Comp. - (D.F.C.C.) carried by fleet flagship.
+                                Controls fuel and drone dispersal. Automatic
+                                switching to combat mode when alien fleet
+                                detected. This computer which controls the 
+                                drones takes up all 3 pod mountings on an IOS
+                                and 6 pod mountings on an SSG. You can have
+                                up to 200 drones in one fleet. When you start
+                                building drones they automatically go to the
+                                drone pool in space. After you install the 
+                                computer, take off and press the Battle 
+                                Computer icon inside the ship. You will then
+                                see a picture of a drone, two icons and the
+                                number of drones in the pool. One of the 
+                                icons is Add to Fleet which will add a drone
+                                to the fleet. The other one is Remove to Pool
+                                which will remove a drone. You can have an 
+                                unlimited amount of drones in the pool but
+                                only 200 in a fleet. Each drone adds 7 to the
+                                fleet power making a total of 1400 if you 
+                                have 200 drones in the fleet. If a Warlord
+                                is the pilot of the ship then each drone's
+                                power will be increased by 3. For an SSG
+                                there is a special type of drone called a
+                                star drone which automatically adds 10 to the
+                                fleet power even if a Warlord is not the
+                                pilot. If the pilot is a Warlord the strength
+                                for each drone is still 10. The only 
+                                advantage to the star drone is that it can 
+                                travel to other solar systems. An SSG can 
+                                only have star drones and an IOS can only 
+                                have IOS battle drones. Also, when the 
+                                computer is installed on the ship, the ship
+                                takes ten times as much fuel (10 ton of fuel
+                                = 1 tons of fuel).
+
+    Self-Destruct Mechanism - (S.D.M.) Methanoid origin. Activated by 
+                              throwing respective levers on reactor and 
+                              cooling system. This is used when the war 
+                              between you and the Methanoids starts. You just
+                              install it and if they attack that factory and
+                              you can't get your drones there in time then 
+                              you pull the two levers and it nukes the whole
+                              place.
+
+    Mass Transciever - (M.T.X.) Methanoid origin. Allows transmission of 
+                       inanimate objects to any receiver. Technical analysis
+                       not understood. Once you have two of these go to
+                       Stores on the orbital factory. Then click on Switch
+                       Storerooms and the MTX will appear with a list of all
+                       the tools, minerals and equipment in the middle that
+                       you can transport, six icons at the bottom and all the
+                       other solar systems and factories you have. Here are 
+                       the descriptions of all the icons.
+       
+      Restore Settings - resets everything that you have selected to be 
+                         transported.
+
+      Switch Storerooms - just switches storerooms.
+
+      Clear Settings - does the same thing as Restore Settings.
+
+      Transmit Everything - marks all the minerals and tools that you see on
+                            the menu.
+
+      Balance Everything - marks everything that you see on the menu equally
+                           so that when it starts transporting both of the
+                           factories will have the same amount of each item
+                           or mineral.
+
+      Scroll Up/Down - scrolls the menu up or down.
+
+      Now if you want to transport, for instance iron, from Earth to Moon go
+      to the MTX that is on Earth and mark iron on the left side. Then select 
+      Sun as the solar system and then Moon as the receiver. Pass a day and 
+      all the iron you had on Earth will be transported to the Moon. If you 
+      want both Earth and the Moon to have the same amount of iron then mark
+      both sides of iron and pass a day. The computer will add both of the
+      factories' supply of iron and then send half of it to Earth and half to
+      the Moon.
+
+    S.C.G Chasis - (G Chasis) Star Class Galleon. Methanoid Origin. Six pod
+                   mountings allow maximum of 1500 ton payload. This ship 
+                   uses a different fuel called Helium Deuterium Fuel (HeD).
+                   There is only one planet in the solar system (our) that
+                   can produce this fuel. 
+
+    S.C.G Drive Unit - (Star Drive) fusion drive unit for interstellar 
+                       travel. Methanoid origin. Requires HeD fuel.
+     
+    S.C.G Battle Drone - (Star Drone) special chasis incorporating 2 fusion
+                         lasers. More powerful version of the IOS Drone and
+                         capable of intersteller travel. Flight controlled
+                         via flagship drone computer.
+
+    Prejudice Torpedo Launcher - (P.T.L) fires a torpedo loaded with 100T of
+                                 fuel from the host ship tanks. Detonation
+                                 is triggered when the predicted outcome is
+                                 prejudiced against enemy drones. Cockpit
+                                 mounted. When you install this to a ship and
+                                 attack a planet, click on the Battle 
+                                 Computer and there will be an icon that
+                                 looks like a torpedo. When you see that the
+                                 enemy drones are closesly packed together
+                                 launch the torpedo. You can only fire two of
+                                 these if you have full fuel.
+
+    Pulse Blast Laser - (Blaser) highly destructive pulse weapon. Requires
+                        at least 3 chasis units for correct operation. This
+                        is an awesome weapon for defending factories. Not
+                        only does it destroy the enemy drones but also the
+                        ship that carries the weapon. This does not require
+                        any pilots and you cannot fly anywhere with it once
+                        it is installed.
+
+    Sonic Blaster - (Blaster) Methanoid origin. Fusion powered unit. Emits
+                    pulses at present intervals and frequencies. Power 
+                    adjuster fitted. This is NOT a weapon even though the 
+                    scientists say it is. All it does is play music.
+
+    Prison Pod - (?) I did not get this in the game so cannot explain it. It
+                 is an optional part of the game.
+
+    UNKNOWN ITEM - (Unknown) Composition - Unknown  Function - Unknown 
+                   Mounting suitable for Tool Pod. I cannot tell you anything
+                   about this or it would ruin the game!
+
+Space Bay - same as shuttle bay
+
+Spacedock - same as shuttle bay except that it is used for IOSs and SCGs.
+
+Self-Destruct Mechanism - this is used later in the game to nuke the whole
+                          factory to stop the Methanoids from getting it. To
+                          the left are two switches (Cooling System and 
+                          Reactor Control). Flipping both of these will 
+                          activate a 12 second countdown and then nuke the
+                          whole factory. To deactivate the countdown just
+                          flip both of the switches again.
+
+The Solve 
+---------
+This solve is not in FULL detail bacause it would take much too long to write
+step by step everything you are to do. Well here it is!
+
+
+Ok, the first thing to do at the beginning is to train 200 producers, 250
+researchers, and 41 marines. Once you have them trained start building rigs
+and at the same time research all the stuff that you have. Once you have 8 
+rigs make them mine. After you researched everything build a shuttle and 
+equip it with a factory section. Send it into space and set up the first
+section. Land and get another section and repeat this until the factory is 
+complete. Now your scientists should have come up with the IOS and its
+attachments. Build the IOS and equip it with more factory sections and send
+it to build more factories. Do not set up more than 5 factories because the
+Methanoids will declare war on you. The best planets to build factories at
+are Earth, Moon, Venus, Leda, and Callisto. After you have these factories
+launch an IOS equiped with 3 grapples to the asteroids. Go inside the ship
+and activate the grapple. Then pass a few days until the computer scans and
+finds an asteroid. Pass days some more until a suitable asteroid made of the
+mineral you need to make the R Frame appears and is not more than 250T in 
+mass. Retrieve the asteroid and go to any factory. Click on the grapple that
+has the asteroid and the mineral will be extracted from it. Now you can build
+the R Frames. Equip one R Frame onto a shuttle and land with it on a planet.
+You must have a factory over that planet though. Click on the Tool Pod which
+contains the Frame and the computer will correctly position it. Launch and
+get another frame and do the same thing. Now you have a Resource station.
+Make these resource stations on every planet that you have an orbital factory
+over (remember, no more than five factories). On each of your 5 factories,
+including Earth, make sure you have 8 rigs that are mining. Also, on each 
+factory you should have a shuttle with an ACC bringing up all the needed
+minerals that the rigs are producing to the factory. Ok, before you start the
+war with the Methanoids 4 of your factories should have all of these minerals
+each: 24000T of Iron, 24000T of Titanium, 24000T of Aluminum, 3000T of 
+Carbon, 11000T of Copper, 6000T of Paladium, and 6000T of platinum. This will
+take you a long time to do but it's the only way. Also you should have an AOC
+on each of these 4 factories. Have alot of fuel on Earth and Leda and also
+a IOS with a tool pod ready in Space bay on both of these factories before 
+starting the war. Now send an IOS and build the 6th factory and you will 
+receive a message from the Methanoids. Pass a day and your scientists will
+invent the Drone Computer and the Drones. Research these two and build two
+drone computers one on Earth and one on Leda. At the same time make the 
+AOC build drones on the other two. Once you have the drone computers built 
+make the two other factories build drones. Set the AOC on automatic drone 
+building so you won't have to run around from factory to factory to set
+production. While your factories are building drones install the two drone 
+computers onto the IOSs that you have on Earth and Leda. Fuel the ships and
+put Admirals in as their pilots. Launch both of them. Go inside the one that
+is around Leda and click on the Battle Computer and add all the drones that
+Leda has built to the fleet. Keep adding drones one by one until you reach 
+about 20. Then go to the IOS that is around Earth and add the drones that are
+there to the fleet. Then fly the IOS to the closest factory that is producing
+drones which is the Moon and add those drones to the fleet. Next fly the IOS
+to Callisto and take those drones and then fly to Leda and Remove all the 
+drones you collected to the pool and fly back to Earth. Then with the other
+IOS that is around Leda add all those drones to the fleet. You should now
+have an IOS around Leda with around 80 to 90 drones. Always keep this IOS
+around Leda because that is the place the Methanoids will attack first. If
+they attack Callisto just fly the IOS from Leda to Callisto. When the 
+Methanoids attack one of your factories you have 4 days to get an IOS there
+and defeat them. Ok, now build 20 more drones on all 4 factories and collect
+them with the IOS that is in Earth orbit and take them to Leda. Put them in 
+pool and fly back to Earth. Now with the other IOS add them to the fleet and
+you should have about 160 to 170 drones. Keep doing this and if you succeed
+in getting 200 drones before they attack you save the game and attack 
+Jupiter. If you loose then load the game. If you win the IOS will 
+automatically dock at the factory. Now quickly click on the PANIC icon (Self-
+Destruct Mechanism) and then back to the IOS and take off fast. The factory
+will be destroyed. Pass a day or two and your scientists will copy the 
+Methanoid's Self-Destruct Mechanism. Research it and build it on all of your
+factories. Now keep building drones and keep transfering them to Leda. Also
+fly the IOS that is around Jupiter to Leda. Once you have another 200 drones
+attack Uranus. Save first though. When you win click on the PANIC icon and 
+switch the two levers at the right side of the screen. That should deactivate
+the Self-Destruct Mech. Now go to Stores on Uranus and then click on Switch
+Storerooms and you will see the M.T.X. Pass a day or two and your scientists
+will copy the M.T.X. Build this on all factories. Now all the drones you
+build on the 4 factories make the M.T.X automatically transfer them to 
+Uranus. Build more drones and attack the Methanoids at Titania, then at 
+Neptune, then at Triton and at Pluto. After you conquer Pluto your scientists
+will find plans for the S.C.G in the Methanoids records and also the Star
+drones. Don't build it YET and don't worry about it YET. Now build an IOS
+on Neptune and install the D.F.C.C into it and launch it into orbit. Also 
+build an IOS on Callisto and install the D.F.C.C into it and launch it into
+orbit. While you are doing this make sure those 4 factories are building 
+drones and sending them to Uranus. Also fly the IOS with which you conquered 
+Pluto to Uranus. Forget about Pluto, if the Methanoids attack it just nuke
+it. The Methanoids will keep attacking you even though they have no more 
+factories in that solar system. Now with the IOS that is around Uranus 
+collect all the drones that are there into the remaining fleet. Keep building
+them until you have 200. Now wherever they attack you can defend it. If they
+attack you at Titania just fly your IOS from Uranus to Titania, save it first
+and kick their butt. It will take 4 days to fly there but that is enough. 
+After you win return the IOS to Uranus. If they attack you at Leda just 
+remove the drones from the IOS that is around Uranus and transport them by
+the M.T.X to Callisto. At Callisto you should have an IOS so just add them
+to the fleet and fly to Leda and kick their butt again. You should have
+4 IOSs with the D.F.C.C. One around Earth, one around Callisto, one around
+Uranus and one around Neptune. All of your factories will be protected in
+this way except Venus which they will not attack in a LONG time. Keep 
+building drones and transporting them to Uranus. You must also build as many
+orbital factories as you can (16 is the limit for every solar system). Make
+sure that you have IOSs with the D.F.C.C to protect them all. Try to pick
+planets that have good resources (the most needed resources later in the game
+are paladium and silver). Oh! equip an IOS with a grapple on Earth and launch
+it into orbit. Activate the grapple and you will find the first part of the
+UNKNOWN item. Seven more parts to go! Stock up on resources and make 3 
+factories build star drones but keep building the IOS drones too. This will
+take you a while to do. Build an S.C.G and equip it with the D.F.C.C. Oh, I 
+hope you researched the S.C.G and the special fuel since only Uranus can 
+produce it. Collect the drones with the S.C.G and make sure you have full 
+fuel. Now most of the rest you will have to do yourself cause it is a pain
+for me to explain it to you. Every time you conquer a solar system the race
+that has been sending messages to you will tell you the location of the next
+part to the Unknown Item. Also, every time you conquer a solar system your
+scientists will research a new item (well almost every time). You only need
+to conquer seven other solar systems to win the game even though there are     
+eight. Now what you must do is send the S.C.G with the star drones to a 
+system with the least amount of planets (Proxima will do). Fly to Pacific
+and conquer it. Then transport some star drones to Pacific and add them to
+the fleet to make a full 200. Now fly to Barent and conquer that too. 
+Transport a grapple and a tool pod to Barent and equip it on to the S.C.G.
+Pass a day or two and the aliens will tell you the location of the next part.
+Fly to that planet and take the item with the grapple and fly back to Barent.
+Remove the item for research and equip the D.F.C.C onto the ship and refuel.
+After a few days your scientists should invent a formula that will allow you 
+to fly faster than the speed of light. Research the formula. Also make sure
+you have an IOS with drones to protect the two planets in that system. Now
+since you can fly to any system and back very fast you should make all of
+your Admirals into Warlords so the strenght of the IOS drones will be 
+increased. An Admiral changes into a Warlord just by flying to another system
+faster than the speed of light. So fly all of your Admirals to Proxima and 
+back until all of them are Warlords. The rest is very simple, build up 
+drones, attack another system, conquer it, retreive the part of the Unknown
+item, build up more drones and repeat this process until you have conquered
+7 systems and have all parts to the Unknown item. Once you have all the parts
+the aliens will send you a message with the instructions on how to use it.
+Build the item and put it on a tool pod onto an S.C.G. Launch the S.C.G into
+orbit and activate the item in the tool pod. You will then see the END 
+sequence and you have finished Deuteros. If you have any problems leave me 
+a message on either my board or these elite bbss: Necropolis, Ghetto, Link
+To Perfection, Bigfoots or Black Plague...                                                      
+                                                  -Sycon
+
+Make Sure To Call these TSL BOARDS:
+
+ *BACK IN TSL* TSL WHQ       TERMINAL DISASTER      215-739-2150  
+               EURO HQ!      THE CRIME ZONE!        +46-87178910  
+               EURO HQ!        !MOLDAVIA!           +32-13553962  
+               TSL  HQ!    HARMONIC CONVERGENCE     510-686-4536  
+               TSL GHQ!       DARK CENTURY!         +49-5113880447
+               DUTCH HQ           CHAOS             +31-46339129  
+               TSL DHQ!       HIGH TENSION          +45-98625432
+
+& Call The Fastest Italian BBs ++39-564-27311 --> GOTHAM CITY <---- !
