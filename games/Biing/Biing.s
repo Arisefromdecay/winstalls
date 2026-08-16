@@ -1,10 +1,8 @@
 ;*---------------------------------------------------------------------------
 ;  :Program.	BiingHD.asm
-;  :Contents.	Slave for "Biing"
-;  :Author.	JOTD, from Wepl sources
-;  :Original	v1 
-;  :Version.	$Id: BiingHD.asm 1.2 2002/02/08 01:18:39 wepl Exp wepl $
-;  :History.	%DATE% started
+;  :Contents.	Slave for "Biing!"
+;  :Author.	JOTD, Wepl
+;  :History.	2026-08-16 added PROMOTE_DISPLAY, removed Custom1
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -24,7 +22,7 @@
 	BOPT	ODd-				;disable mul optimizing
 	BOPT	ODe-				;disable mul optimizing
 	BOPT	w4-				;disable 64k warnings
-	BOPT	wo-			;disable optimizer warnings
+	BOPT	wo-				;disable optimizer warnings
 	SUPER
 	ENDC
 
@@ -49,6 +47,7 @@ IOCACHE		= 540000
 BOOTDOS
 CBDOSLOADSEG
 FONTHEIGHT=8
+PROMOTE_DISPLAY			;allow DblPAL/NTSC promotion
 SETPATCH
 SEGTRACKER
 
@@ -66,7 +65,7 @@ slv_keyexit	= $5D	; num '*'
 	DOSCMD	"WDate  >T:date"
 	ENDC
 DECL_VERSION:MACRO
-	dc.b	"1.1"
+	dc.b	"1.2"
 	IFD BARFLY
 		dc.b	" "
 		INCBIN	"T:date"
@@ -80,21 +79,17 @@ DECL_VERSION:MACRO
 	DECL_VERSION
 	dc.b	0
 
-slv_name		dc.b	"Biing AGA",0
-slv_copy		dc.b	"1995 ReLINE",0
-slv_info		dc.b	"adapted by JOTD",10,10
-			dc.b	"Thanks to Hubert Maier for disk images",10,10
-			dc.b	"Version "
+slv_name	dc.b	"Biing AGA",0
+slv_copy	dc.b	"1995 ReLINE",0
+slv_info	dc.b	"adapted by JOTD, Wepl",-1
+		dc.b	"Thanks to Hubert Maier for disk images",-1
+		dc.b	"Version "
 	DECL_VERSION
 		dc.b	0
-slv_CurrentDir:
-	dc.b	"data",0
-
-_program:
-	dc.b	"B",0
+slv_CurrentDir	dc.b	"data",0
+_program	dc.b	"B",0
 _args		dc.b	10
-_args_end
-	dc.b	0
+_args_end	dc.b	0
 	EVEN
 
 ; < D0: BSTR filename
@@ -198,10 +193,6 @@ _bootdos
 	move.l	(_resload,pc),a2		;A2 = resload
 
 
-	;get tags
-		lea	(_tag,pc),a0
-		jsr	(resload_Control,a2)
-	
 	;enable cache
 	;	move.l	#WCPUF_Base_NC|WCPUF_Exp_CB|WCPUF_Slave_CB|WCPUF_IC|WCPUF_DC|WCPUF_BC|WCPUF_SS|WCPUF_SB,d0
 	;	move.l	#WCPUF_All,d1
@@ -283,11 +274,6 @@ _load_exe:
 	move.l	(_resload,pc),-(a7)
 	add.l	#resload_Abort,(a7)
 	rts
-
-
-_tag		dc.l	WHDLTAG_CUSTOM1_GET
-_custom1	dc.l	0
-		dc.l	0
 
 ;============================================================================
 

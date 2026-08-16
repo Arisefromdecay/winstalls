@@ -1,0 +1,87 @@
+#version=3
+#sub-dir=data
+#P_MakeImages#3
+
+      ;install2 is the patched original reLINE HD installer, it unpacks
+      ;the BIPACK files from JFF: to BDEST:data/
+
+      (set #action
+        (askchoice
+          (prompt "\nWhat do you want to do ?\n")
+          (choices
+            "Install from original floppies"
+            "Install from existing packed files on my HD"
+          )
+          (default 0)
+          (help @askchoice-help)
+        )
+      )
+
+      (if (= 0 #action)
+        (
+          ;copy the packed files from the floppies to a temporary directory
+          (set #tempdest "T:biing")
+          (makedir #tempdest
+            (help @makedir-help)
+          )
+
+          (set #pattern "(BIPACK#?|Install.FNT|InAMHE)")
+          (set #diskindex 1)
+
+          (while (< #diskindex 19)
+            (
+              (set #AD_disk ("BIING! AGA V1.0 DISK%02ld" #diskindex))
+              (P_AskDisk)
+              (copyfiles
+                (help @copyfiles-help)
+                (source ("%s:" #AD_disk))
+                (dest #tempdest)
+                (pattern #pattern)
+              )
+              (set #diskindex (+ 1 #diskindex))
+            )
+          )
+
+          ; last disk has different label, grrr
+          (set #AD_disk ("BIING! AGA V1.2 DISK%02ld" #diskindex))
+          (P_AskDisk)
+          (copyfiles
+            (help @copyfiles-help)
+            (source ("%s:" #AD_disk))
+            (dest #tempdest)
+            (pattern #pattern)
+          )
+        )
+        (
+          ;the packed files are already on the hard disk
+          (set #tempdest
+            (askdir
+              (prompt "Where are the packed files located?")
+              (help @askdir-help)
+              (default "ram:")
+            )
+          )
+        )
+      )
+
+      (copyfiles
+        (help @copyfiles-help)
+        (source "install2")
+        (dest #tempdest)
+      )
+      (protect (tackon #tempdest "install2") "+e")
+
+      (run ("c:assign BDEST: \"%s\"" #dest-org))
+      (run ("c:assign JFF: \"%s\"" #tempdest))
+
+      (run "cd JFF:\nJFF:install2")
+
+      (run ("c:assign BDEST: \"%s\" REMOVE" #dest-org))
+      (run ("c:assign JFF: \"%s\" REMOVE" #tempdest))
+
+      (delete (tackon #tempdest "install2"))
+      (if (= 0 #action)
+        (delete (tackon #tempdest #pattern))
+      )
+      (delete (tackon #dest-org "data.info"))
+

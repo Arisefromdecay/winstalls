@@ -1,0 +1,80 @@
+
+                      B I I N G !  Amiga Standard / AGA
+
+    Haeufig gestellte schlaue Fragen und die dummen Antworten darauf...
+
+
+
+?: Woran sehe ich, dass ich die Passwortabfrage falsch beantwortet habe?
+!: Um das Programm vor Crackversuchen zu schuetzen, erfolgt keine sofortige
+   Rueckmeldung. Nach einiger Zeit erscheint jedoch ein Zeitungsbericht, in
+   dem die Falscheingabe gemeldet wird.
+
+
+
+?: Ich besitze noch einen Amiga aus der Steinzeit, der nur 512 KB Chipmem
+   hat. Kann ich das Spiel trotzdem irgendwie zum Laufen bekommen?
+!: Na klar. Mit dem Config-Programm muss die Soundausgabe sowie der ver-
+   deckte Bildaufbau abgeschaltet werden. Es erscheint zwar eine Meldung,
+   dass letzteres nicht durchgefuehrt werden sollte, dies muss man in
+   diesem Fall aber einfach ignorieren.
+
+
+
+?: Laeuft BIING! auch mit meiner wunderschoenen Grafikkarte?
+!: Da das Spiel direkt auf die Grafikhardware zugreift, war dies leider
+   nicht moeglich. Man haette naemlich fuer jedes einzelne Fabrikat eigene
+   Routinen schreiben muessen. Und dann waere BIING! erst ein Jahr spaeter
+   erschienen.
+
+
+
+?: Wenn ich in einem der Flimmerfrei-Modi starte, sehe ich keinen Maus-
+   zeiger. Was Huhn?
+!: Falls die Workbench im Overscan laeuft, kann dies bereits eine Ursache
+   sein. Also Overscan abschalten und am besten den Treiber "VGA only" in
+   das Monitors-Verzeichnis kopieren.
+
+
+
+?: So sehr ich es auch versuche, ich gehe immer nach kuerzester Zeit pleite.
+   Bin ich zu dumm, oder ist das Spiel zu schwer?
+!: Gleich zu Spielbeginn sollte unbedingt der Kostenschluessel drastisch er-
+   hoeht werden. Das veraergert zwar die Patienten, aber nur so ist es
+   moeglich, ein kleines Finanzpolster zu bilden. Ausserdem zu Beginn
+   einfach 'mal mit drei Behandlungseinheiten versuchen.
+
+
+
+?: Warum stuerzt das Spiel bei mir manchmal ab?
+!: Tja, in ganz seltenen Faellen kann das tatsaechlich passieren. Am besten
+   gleich das Update BIPRO (V1.21 oder hoeher) hier aus dem Brett down-
+   loaden, entpacken und in das BIING!-Hauptverzeichnis kopieren.
+
+
+
+?: Wenn ich ein Gebaeude verkaufen will, kommt die Meldung, dass ich keines
+   habe.
+!: Das ist peinlicherweise ein kleiner Bug, der aber zum Glueck keine
+   fatalen Folgen fuer den Spielablauf hat. Schliesslich sollte man
+   Gebaeudeverkaeufe eh' vermeiden, da dies immer mit einem finanziellen
+   Verlust verbunden ist.Dieser Fehler ist in BIPRO (ab V1.3) behoben.
+
+
+
+?: Ist eine CD-Version geplant? Und wann wird sie erscheinen?
+!: Ja, aber Termine werden von Softwareentwicklern sowieso nie eingehalten.
+   Sobald die Version erscheint, wird dies in den Spielemagazinen gemeldet.
+
+
+
+?: Wird reLINE auch weiterhin Spiele fuer den Amiga entwickeln?
+!: Das haengt ganz von der Entwicklung der Marktanteile ab. Sollten sie
+   wieder ansteigen, stehen die Chancen gut.
+
+
+?: Ich habe eine Schwarzkopie von BIING! und wundere mich, dass es nach ein
+   paar Tagen abstuerzt.
+!: Nicht wundern, sondern Original kaufen. Es gibt zwar Schwarzkopien, in
+   denen die Passwortabfrage entfernt wurde, dies hat aber verheerende
+   Folgen fuer den Spielverlauf.

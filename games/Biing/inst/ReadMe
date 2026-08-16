@@ -16,7 +16,18 @@
  WHDLoad package.
 
  The installed program requires 2.0 MB ChipMem and 3.5 MB OtherMem, but more
- seriously you should use PRELOAD which requires 40MB of fastmem !!
+ seriously you should use PRELOAD which requires 40MB of extra mem !!
+
+ After installation from disk you should update the bipro executable with
+ https://aminet.net/package/game/patch/Bipro1.4
+
+ Due to the size of the game it's recommended to use WHDLoad option PreloadSmart
+ instead of Preload.
+
+ The game also runs in DblPAL screen mode. To use you must copy the monitor
+ file DEVS:Monitors/DblPAL from an AmigaOS 3.1 system to the game installation
+ directory (inside data) and use the WHDLoad option DblPAL. DblNTSC works the
+ same way, but the game has gfx bugs then. Maybe it does not really support it.
 
  It can be quit by pressing num '*' (key can be changed with Tooltype "QuitKey=").
 
@@ -31,7 +42,6 @@
  must be installed in the same directory as the kickstart image.
  It can be found in the archive "util/boot/skick346.lha" on aminet.
 
-
  If you have problems with this installation please try and get a newer
  version of this package from the WHDLoad WWW-Page. If that doesn't help try
  some Tooltypes like NOCACHE, NOAUTOVEC, NOVBRMOVE, NOMMU, PAL or NTSC. If
@@ -42,6 +52,11 @@
 	http://www.whdload.de/
  or	aminet:dev/misc/whdload#?
  and	aminet:game/patch/
+
+ version 1.2 (16.08.2026) done by Wepl:
+ - support for DblNTSC/PAL screen modes added
+ - updated install script
+ - source: https://github.com/wepl/winstalls/
 
  version 1.1 (16.04.2022) done by JOTD:
  - reassembled with latest kickemu
