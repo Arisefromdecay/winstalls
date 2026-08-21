@@ -10,6 +10,7 @@
 ;		24.04.16 version bump
 ;		15.11.21 updated for new kickemu
 ;		11.07.26 WHDCtrl now also works with A600/A4000 kickstart
+;		04.08.26 add some MemConfig options
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -77,7 +78,7 @@ WHDCTRL				;add WHDCtrl resident command
 
 ;============================================================================
 
-slv_Version	= 16
+slv_Version	= 20
 slv_Flags	= WHDLF_NoError
 slv_keyexit	= $5D
 
@@ -91,10 +92,16 @@ slv_CurrentDir	dc.b	"data",0
 slv_name	dc.b	"Generic KickStarter 40.068",0
 slv_copy	dc.b	"1985-93 Commodore-Amiga Inc.",0
 slv_info	dc.b	"by JOTD, Wepl",10
-		dc.b	"Version 1.7 "
+		dc.b	"Version 1.8 "
 		INCBIN	".date"
 		dc.b	0
 	EVEN
+slv_config	= slv_base				; disabled
+slv_MemConfig	dc.l	$1ff000,$400000+KICKSIZE	; 2M + 4M
+		dc.l	$1ff000,$2000000+KICKSIZE	; 2M + 32M
+		dc.l	$1ff000,KICKSIZE		; 2M + 0M
+		dc.l	$ff000,KICKSIZE			; 1M + 0M
+		dc.l	0
 
 ;============================================================================
 

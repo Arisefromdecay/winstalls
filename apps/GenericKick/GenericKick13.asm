@@ -10,6 +10,7 @@
 ;		15.11.21 updated for new kickemu, _cb_dosLoadSeg added
 ;		28.09.22 ignore unset names in _cb_dosLoadSeg
 ;		19.02.23 WHDCTRL added
+;		04.08.26 add some MemConfig options
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
 ;  :Language.	68000 Assembler
@@ -68,7 +69,7 @@ WHDCTRL				;add WHDCtrl resident command
 
 ;============================================================================
 
-slv_Version	= 16
+slv_Version	= 20
 slv_Flags	= WHDLF_NoError
 slv_keyexit	= $5D
 
@@ -82,10 +83,15 @@ slv_CurrentDir	dc.b	"data",0
 slv_name	dc.b	"Generic KickStarter 34.005",0
 slv_copy	dc.b	"1987 Amiga Inc.",0
 slv_info	dc.b	"by JOTD, Wepl",10
-		dc.b	"Version 1.6 "
+		dc.b	"Version 1.8 "
 		INCBIN	".date"
 		dc.b	0
 	EVEN
+slv_config	= slv_base				; disabled
+slv_MemConfig	dc.l	$1ff000,$1000000+KICKSIZE	; 2M + 16M
+		dc.l	$ff000,KICKSIZE			; 1M + 0M
+		dc.l	$80000,KICKSIZE			; 512K + 0M
+		dc.l	0
 
 ;============================================================================
 ; callback/hook which gets executed after each successful call to dos.LoadSeg

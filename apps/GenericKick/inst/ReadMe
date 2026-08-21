@@ -59,3 +59,6 @@ History:
 - fixed WHDCtrl which was only working with the A1200 kickstart, it is now
   available with the A600 and A4000 kickstart too
 
+1.8 (04.08.2026) by Wepl
+- add multiple memory configurations
+
