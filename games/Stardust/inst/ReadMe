@@ -1,0 +1,73 @@
+
+	This install applies to "Stardust" © 1993 Bloodhouse
+
+
+	This install requires WHDLoad and RawDIC to be in the path.
+	Both can be found in the WHDLoad package.
+	To install from a different drive than DF0: select Expert as
+	installation mode.
+
+	You need 1.0 MB ChipMem and 0.5 MB OtherMem.
+	You can quit the game by pressing F10 (key can be changed with
+	Tooltype "QuitKey=")
+
+
+	Features:
+	- full load from HD
+	- copy protection removed
+	- access faults fixed
+	- blitter waits inserted
+	- load/save highscore + password
+	- skip intro option (set CUSTOM1=1 tooltype) 
+	- nice NI/MWB icons included,
+
+	Thanx to:
+	- Chris Vella for original disk images.
+
+	version 1.0 (??-Mar-2000) done by Mr Larmer
+	- first public release
+
+	version 1.1 (27-Mar-2000) done by Mr Larmer
+	- all levels work
+
+	version 1.2 (13-Dec-2000) done by Bored Seal:
+	- level password is saved
+	- highscore is saved to separated file now.
+	- highscores are saved even for unregistered users now
+	- access faults fixed
+	- disk access removed
+
+	version 1.3 (09-Jan-2001) done by Bored Seal
+	- intro sound works again (my bug, sorry)
+	- 6x blitter waits in intro and asteroid part added
+	- CACR operation removed
+	- skip intro option added (set custom1=1 for faster boot)
+
+	version 1.4 (26-Jun-2006) done by Wepl
+	- fixed to be compatible with WHDload v16.6 (resload_Control)
+	- uses 'data' sub directory
+	- new install script
+	- source included
+	- an os3.5 icon, manual and hints added
+
+	version 1.5 (13-Nov-2017) done by StingRay
+	- 68000 quitkey support
+	- support for fire button 2 added (to access weapon menu)
+	- Bplcon0 color bit fixes
+	- blitter wait added
+	- WHDLoad v17+ features used (config)
+
+	version 1.6 (26-Dec-2022) done by StingRay
+	- crash when quitting after tunnel sequence fixed (issue #5548)
+	- graphics problems when starting level fixed (introduced in V1.5)
+	
+	version 1.6, #2 (26-Dec-2022) done by StingRay
+	- old V1.5 slave was still in the archive, now the correct slave
+	  is included (thanks Retroplay)
+
+	version 1.6, #3 (26-Dec-2022) done by StingRay
+	- all good things come in threes, data directory path fixed
+	  (thanks to Retroplay again)
+	
+           for full WHDLoad package and other installs refer to:
+                          http://www.whdload.de

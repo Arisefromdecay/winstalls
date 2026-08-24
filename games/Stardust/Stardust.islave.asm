@@ -10,7 +10,7 @@
 		dc.l	DSK_1	; Pointer to the first disk structure
 		dc.l	Text	; Pointer to the text displayed in the imager window
 
-		dc.b	"$VER:"
+		dc.b	"$VER: "
 Text:		dc.b	"Stardust imager V1.0",10,"by Mr.Larmer/Wanted Team on 25.12.1999",0
 		cnop	0,4
 
