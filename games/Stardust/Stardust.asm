@@ -48,8 +48,7 @@
 ;			no highscore save when cheating (custom3)
 ;		23.08.2026 splash optimised, unlimited energy in main and tunnels1-4,
 ;			fuel in special missions, shield in main game and special missions, weapons trained
-;			todo - already experimented with level select from splash, works for
-;			itself, but collides with password system and/or max weapon option
+;		26.08.2026 added levelselect
 ;
 ;  :Requires.	-
 ;  :Copyright.	Public Domain
@@ -103,9 +102,10 @@ HEADER		SLAVE_HEADER		;ws_Security + ws_ID
 	dc.b	"C3:X:Unlimited Energy/Fuel (in Special Missions):1;"
 	dc.b	"C3:X:Unlimited Shields:2;"
 	dc.b	"C3:X:Unlimited Time:3;"
-	;dc.b    "C3:X:Set own password:4;" 		;for debug/testing
+	;dc.b    "C3:X:Set own password:4;" 		;for debug/testing, see password breakdown
 	dc.b	"C3:X:Keep Weapon Power:5;"
 	dc.b	"C3:X:Start with max Weapons:6;"
+	dc.b    "C4:L:Startlevel:Level 1,Level 2,Level 3,Level 4,Level 5"
 	dc.b	0
 
 
@@ -453,6 +453,12 @@ PLGAME	PL_START
 	PL_S	$6ccd2,$54			;skip rest of routine
 	PL_PSS	$6cbba,_weapons,6	;must be called here too, if password is used
 	PL_ENDIF
+	PL_IFC4
+	PL_PS   $6ca7c,_lvsel	    ;override check if password is present, branch to own code instead
+	PL_S    $6ca82,$34		    ;skip checksum calculation to level selection
+	PL_S    $6cae6,$d4		    ;skip rest (to $ecbc6) of password routine to the max weapons location
+	PL_NOPS	$6cbc0,3			;nop out the rest
+	PL_ENDIF
 	PL_END
 
 ;Password system breakdown:
@@ -468,7 +474,7 @@ PLGAME	PL_START
 ;7:		Burster Power (Q=1 R=2)
 ;8:		Missile (Q=1 R=2 S=3 T=4 U=5 V=6 W=7 X=8 Y=9)
 ;9:		unused
-;0:		Engine Power: (A=Default Q=VERY slow... W=VERY fast)
+;0:		Engine Power: (A=VERY slow... W=VERY fast)
 ;XX:	Checksum (check at $ecab2)
 
 .checkquit3
@@ -565,6 +571,31 @@ PLGAME	PL_START
 
 .fire2	dc.b	0
 	dc.b	0			; delay
+
+_lvsel
+	move.l startmiss(pc),d0
+	beq .nostartlv			    ;if custom4 is 0 but the patches are applied for some reason >skip
+	cmp #5,d0				    ;value to big?
+	bhs .nostartlv			    ;we skip
+	move.b d0,$ece6c		    ;move lvlnumber to first digit of password
+.nostartlv 						
+	move.b #$F,$8435c           ;original code for weapons and other values
+	move.b #0,$8435d            ;since the password routine was skipped the game wont have used
+	move.b #0,$8435e            ;the original routine
+	move.b #0,$8435f
+	move.b #0,$84360
+	move.b #1,$84361
+	move.b #0,$84362
+	clr.w $87979
+	clr.w $8796c
+	clr.w $8796a
+	clr.w $8796e
+	move.w #$0014,$94c68
+	clr.w $94b70
+	clr.w $94b72
+	move.w #$0008,$94c6e
+	move.b d0,$ece6c
+	rts
 
 _weapons
 	move.b #1,$8435d
@@ -1183,7 +1214,7 @@ LoadSaveHighs	movem.l	d0-a6,-(sp)
 		lea	(a0),a1			;address
 		bsr	Params
 		jsr	(resload_SaveFile,a2)
-		lea	password(pc),a0
+.nohighs	lea	password(pc),a0
 		lea	$ece6c,a1
 		moveq	#12,d0
 		jsr	(resload_SaveFile,a2)
@@ -1242,6 +1273,8 @@ _tags		dc.l	WHDLTAG_CUSTOM1_GET
 SKIPINTRO	dc.l    0
 cheatflag	dc.l	WHDLTAG_CUSTOM3_GET
 cheat		dc.l	0
+missionsel	dc.l	WHDLTAG_CUSTOM4_GET
+startmiss	dc.l	0
 		dc.l	TAG_DONE
 
 _savename	dc.b	'Highs',0
